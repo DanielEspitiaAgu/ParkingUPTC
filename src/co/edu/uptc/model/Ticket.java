@@ -9,7 +9,7 @@ public class Ticket {
     private String vehicleNumberPlate;
     private boolean isComplete;
 
-    public Ticket(LocalDateTime entryDate, LocalDateTime exitDate, double cost, String vehicleNumberPlate) {
+    public Ticket(LocalDateTime entryDate, String vehicleNumberPlate) {
         this.entryDate = entryDate;
         this.vehicleNumberPlate = vehicleNumberPlate;
         this.exitDate = null;
@@ -66,8 +66,8 @@ public class Ticket {
         this.isComplete = isComplete;
     }
 
-    public void setExitAttributes(LocalDateTime exitDate, double change) {
-        this.exitDate = exitDate;
+    public void setExitAttributes(double change) {
+        this.exitDate = LocalDateTime.now();
         this.change = change;
         this.isComplete = true;
         cost = 2000 + Parking.minuteFee*(entryDate.getMinute() - exitDate.getMinute());
