@@ -5,11 +5,12 @@ import java.time.LocalDate;
 public class ParkingSystem {
     private ArrayList<User> users;
     private ArrayList<Parking> parkings;
+    private User currentUser;
 
     public ParkingSystem() {
         users = new ArrayList<User>();
         parkings = new ArrayList<Parking>();
-        Admin admin = new Admin("admin", "admin@uptc.edu.co", "123abc", this);
+        Admin admin = new Admin("0001", "admin@uptc.edu.co", "123abc", this, "Pedrito", "Rodriguez");
         users.add(admin);
         ArrayList<String> schedule = new ArrayList<String>();
         schedule.add("Lunes-6:00-22:00");        
@@ -19,6 +20,14 @@ public class ParkingSystem {
         schedule.add("Viernes-6:00-22:00");
         schedule.add("Sabado-6:00-22:00");
         admin.createParking("UPTC Parking", "Calle 1, 123", 10, new ArrayList<String>());
+    }
+
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
     }
 
     public void setUsers(ArrayList<User> users) {
@@ -39,7 +48,7 @@ public class ParkingSystem {
 
     public User logIn(String userName, String password) {
         for(User user:users){
-            if(user.getUserName().equals(userName.toLowerCase()) && user.getPassword().equals(password)){
+            if(user.getIdNumber().equals(userName.toLowerCase()) && user.getPassword().equals(password)){
                 return user;
             }
         }
@@ -53,7 +62,7 @@ public class ParkingSystem {
             parkingReport.add(parking.getName());
             double income = 0;
             int numCars = 0;
-            for (GateControl gate:parking.getGates()){
+            for (GateControl gate:parking.getGateControls()){
                 income += gate.calculateIncome(date);
                 numCars += gate.calculateVehiclesIncome(date);
             }
@@ -66,9 +75,9 @@ public class ParkingSystem {
     public ArrayList<ArrayList<String>> generateReceptionistReport(LocalDate date){
         ArrayList<ArrayList<String>> receptionistReports = new ArrayList<ArrayList<String>>();
         for(Parking parking:parkings){
-            if (parking.getGates().size() > 0) {
+            if (parking.getGateControls().size() > 0) {
                 ArrayList<String> receptionistReport = new ArrayList<String>();
-                for (GateControl gate:parking.getGates()){
+                for (GateControl gate:parking.getGateControls()){
                     receptionistReport.add(gate.getReceptionist().getName()+" "+gate.getReceptionist().getLastName());
                     receptionistReport.add(gate.calculateIncome(date)+"");
                     receptionistReport.add(gate.calculateVehiclesIncome(date)+"");

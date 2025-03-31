@@ -1,22 +1,40 @@
 package co.edu.uptc.model;
 
 public class User {
-    private String userName;
+    private String idNumber;
     private String email;
     private String password;
+    private String name;
+    private String lastName;
 
-    public User(String userName, String email, String password) {
-        this.userName = userName;
+    public User(String idNumber, String email, String password, String name, String lastName) {
+        this.idNumber = idNumber;
         this.email = email;
         this.password = password;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getName() {
+        return name;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getIdNumber() {
+        return idNumber;
+    }
+
+    public void setIdNumber(String userName) {
+        this.idNumber = userName;
     }
 
     public String getEmail() {

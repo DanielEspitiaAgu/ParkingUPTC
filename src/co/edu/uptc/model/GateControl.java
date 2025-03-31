@@ -64,8 +64,8 @@ public class GateControl {
         return income;
     }
     
-    public double calculateVehiclesIncome(LocalDate date){
-        double numCars = 0;
+    public int calculateVehiclesIncome(LocalDate date){
+        int numCars = 0;
         for (Ticket ticket:tickets){
             if (ticket.getEntryDate().getYear()==date.getYear() && ticket.getEntryDate().getDayOfYear()==date.getDayOfYear()){
                 numCars++;

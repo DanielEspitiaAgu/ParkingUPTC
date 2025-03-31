@@ -7,37 +7,49 @@ public class Parking {
     public static final int minuteFee = 50; 
     private String name;
     private String address;
-    private int capacity;
+    private int spaces;
     private int occupiedSpaces;
     private ArrayList<ServiceDaySchedule> schedule;
-    private ArrayList<GateControl> gates;
+    private ArrayList<GateControl> gateControls;
 
-    public Parking(String name, String address, int capacity, ArrayList<String> scheduleList) {
+    public Parking(String name, String address, int spaces, ArrayList<String> scheduleList) {
         this.name = name;
         this.address = address;
-        this.capacity = capacity;
+        this.spaces = spaces;
         occupiedSpaces = 0;
         this.schedule = createServiceDaySchedules(scheduleList);
-        this.gates = new ArrayList<GateControl>();
+        this.gateControls = new ArrayList<GateControl>();
     }
 
     private ArrayList<ServiceDaySchedule> createServiceDaySchedules(ArrayList<String> scheduleList){
         ArrayList<ServiceDaySchedule> serviceDaySchedules= new ArrayList<>();
         for (int i = 0; i < scheduleList.size(); i++) {
             String[] aspects= scheduleList.get(i).split("-");
+            int day = 0;
+            switch (aspects[0]) {
+                case "Lunes": day = 1; break;
+                case "Martes": day = 2; break;
+                case "Miercoles": day = 3; break;
+                case "Jueves": day = 4; break;
+                case "Viernes": day = 5; break; 
+                case "Sabado": day = 6; break;
+                case "Domingo": day = 7; break;
+                case "Festivo": day = 8; break;
+                default: throw new IllegalArgumentException("Invalid day");
+            }
             serviceDaySchedules.add(new ServiceDaySchedule(Integer.parseInt(aspects[0]), LocalTime.parse(aspects[1]), LocalTime.parse(aspects[2])));
         }
         return serviceDaySchedules;
     }
 
     public GateControl validateGateControl(Receptionist receptionist){
-        for(GateControl gate:gates){
-            if(gate.getReceptionist().getUserName().equals(receptionist.getUserName())){
+        for(GateControl gate:gateControls){
+            if(gate.getReceptionist().getIdNumber().equals(receptionist.getIdNumber())){
                 return gate;
             }
         }
-        gates.add(new GateControl(receptionist));
-        return gates.get(gates.size()-1);
+        gateControls.add(new GateControl(receptionist));
+        return gateControls.get(gateControls.size()-1);
     }
 
     public String getName() {
@@ -56,12 +68,12 @@ public class Parking {
         this.address = address;
     }
 
-    public int getCapacity() {
-        return capacity;
+    public int getSpaces() {
+        return spaces;
     }
 
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
+    public void setSpaces(int capacity) {
+        this.spaces = capacity;
     }
 
     public int getOcupedParks() {
@@ -80,12 +92,12 @@ public class Parking {
         this.schedule = schedule;
     }
 
-    public ArrayList<GateControl> getGates() {
-        return gates;
+    public ArrayList<GateControl> getGateControls() {
+        return gateControls;
     }
 
-    public void setGates(ArrayList<GateControl> gates) {
-        this.gates = gates;
+    public void setGateControls(ArrayList<GateControl> gates) {
+        this.gateControls = gates;
     }
 
     
