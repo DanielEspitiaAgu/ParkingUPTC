@@ -26,7 +26,7 @@ public class MainFrame extends JFrame{
         super("Parking UPTC");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //createLoginPanel();
+        createLoginPanel();
         crateReceptionistMenuPanel();
         createVehicleEntryPanel(2);
         //JTextField textField = new JTextField();
