@@ -8,9 +8,11 @@ public class Ticket {
     private double change;
     private String vehicleNumberPlate;
     private boolean isComplete;
+    private Receptionist receptionist;
 
-    public Ticket(LocalDateTime entryDate, String vehicleNumberPlate) {
+    public Ticket(LocalDateTime entryDate, String vehicleNumberPlate, Receptionist receptionist) {
         this.entryDate = entryDate;
+        this.receptionist = receptionist;
         this.vehicleNumberPlate = vehicleNumberPlate;
         this.exitDate = null;
         this.cost = 0;
@@ -93,4 +95,14 @@ public class Ticket {
         
         return exitTicket;
     }
+
+    public Receptionist getReceptionist() {
+        return receptionist;
+    }
+
+    public void setReceptionist(Receptionist receptionist) {
+        this.receptionist = receptionist;
+    }
+
+    
 }

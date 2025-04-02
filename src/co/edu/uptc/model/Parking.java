@@ -10,7 +10,6 @@ public class Parking {
     private int spaces;
     private int occupiedSpaces;
     private ArrayList<ServiceDaySchedule> schedule;
-    private ArrayList<GateControl> gateControls;
 
     public Parking(String name, String address, int spaces, ArrayList<String> scheduleList) {
         this.name = name;
@@ -18,7 +17,6 @@ public class Parking {
         this.spaces = spaces;
         occupiedSpaces = 0;
         this.schedule = createServiceDaySchedules(scheduleList);
-        this.gateControls = new ArrayList<GateControl>();
     }
 
     private ArrayList<ServiceDaySchedule> createServiceDaySchedules(ArrayList<String> scheduleList){
@@ -40,16 +38,6 @@ public class Parking {
             serviceDaySchedules.add(new ServiceDaySchedule(Integer.parseInt(aspects[0]), LocalTime.parse(aspects[1]), LocalTime.parse(aspects[2])));
         }
         return serviceDaySchedules;
-    }
-
-    public GateControl validateGateControl(Receptionist receptionist){
-        for(GateControl gate:gateControls){
-            if(gate.getReceptionist().getIdNumber().equals(receptionist.getIdNumber())){
-                return gate;
-            }
-        }
-        gateControls.add(new GateControl(receptionist));
-        return gateControls.get(gateControls.size()-1);
     }
 
     public String getName() {
@@ -91,14 +79,4 @@ public class Parking {
     public void setSchedule(ArrayList<ServiceDaySchedule> schedule) {
         this.schedule = schedule;
     }
-
-    public ArrayList<GateControl> getGateControls() {
-        return gateControls;
-    }
-
-    public void setGateControls(ArrayList<GateControl> gates) {
-        this.gateControls = gates;
-    }
-
-    
 }
