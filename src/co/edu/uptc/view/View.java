@@ -1,6 +1,5 @@
 package co.edu.uptc.view;
 
-import javax.smartcardio.Card;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -40,6 +39,8 @@ public class View extends JFrame implements ActionListener{
         jOptionPane = new JOptionPane();
         createLoginPanel();
         createSectionPanel();
+        createAdminMenuPanel();
+        createReceptionistMenuPanel();
         //JTextField textField = new JTextField();
         //textField.setText(regex);
         //JButton button = new JButton("ingresar[action]");
@@ -75,7 +76,8 @@ public class View extends JFrame implements ActionListener{
         config.gridx = 1;
         config.gridy = 1;
         config.anchor = GridBagConstraints.LINE_START;
-        loginPanel.add(new JTextField(20), config);
+        JTextField idField = new JTextField(20);
+        loginPanel.add(idField, config);
 
         config.gridx = 0;
         config.gridy = 2;
@@ -85,14 +87,22 @@ public class View extends JFrame implements ActionListener{
         config.gridx = 1;
         config.gridy = 2;
         config.anchor = GridBagConstraints.LINE_START;
-        loginPanel.add(new JPasswordField(20), config);
+        JPasswordField passwordField = new JPasswordField(20);
+        loginPanel.add(passwordField, config);
 
         config.gridx = 0;
         config.gridy = 3;
         config.gridwidth = 2;
         config.anchor = GridBagConstraints.CENTER;
         JButton button = new JButton("Ingresar");
-        button.addActionListener(this);
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               Presenter.getInstance().login(idField.getText(), passwordField.getText());
+               idField.setText("");
+               passwordField.setText("");
+            }
+        });
         loginPanel.add(button, config);
 
         getContentPane().add(loginPanel, "Login Panel");
@@ -259,15 +269,17 @@ public class View extends JFrame implements ActionListener{
         adminMenuPanel.setLayout(new GridBagLayout());
         GridBagConstraints config = new GridBagConstraints();
 
-        JButton vehicleEntryButton = new JButton("Ingresó de  vehículo");
-        JButton vehicleExitButton = new JButton("Salida de vehículo");
-        JButton disponibleSpaces = new JButton("Espacios disponibles");
+        JButton registParkingButton = new JButton("Registrar parqueadero, Generar reporte de ventas, Cerrar sesión");
+        JButton createReceptionistButton = new JButton("Crear recepcionista");
+        JButton modifyReceptionistButton = new JButton("Modificar recepcionista");
+        JButton generateSalesReportButton = new JButton("Generar reporte de ventas");
         JButton logOutButton = new JButton("Cerrar sesión");
         JPanel buttonBar = new JPanel();
         buttonBar.setLayout(new BoxLayout(buttonBar, BoxLayout.X_AXIS));
-        buttonBar.add(vehicleEntryButton);
-        buttonBar.add(vehicleExitButton);
-        buttonBar.add(disponibleSpaces);
+        buttonBar.add(registParkingButton);
+        buttonBar.add(createReceptionistButton);
+        buttonBar.add(modifyReceptionistButton);
+        buttonBar.add(generateSalesReportButton);
         buttonBar.add(logOutButton);
 
         config.gridx = 0;
@@ -276,6 +288,14 @@ public class View extends JFrame implements ActionListener{
         config.insets = new Insets(10, 10, 10, 10);
         config.anchor = GridBagConstraints.CENTER;
         adminMenuPanel.add(buttonBar, config);
+
+        config.gridy = 1;
+        config.weightx = 1;
+        config.weighty = 1;
+        config.fill = GridBagConstraints.BOTH;
+        config.insets = new Insets(5, 10, 10, 10);
+
+        adminMenuPanel.add(sectionPanel, config);
 
         getContentPane().add(adminMenuPanel, "Admin Panel");
     }
@@ -293,7 +313,8 @@ public class View extends JFrame implements ActionListener{
     }
 
     public void showAdminMenu(){
-
+        
+        ((CardLayout)(getContentPane().getLayout())).show(getContentPane(), "Receptionist Panel");
     }
 
     @Override
