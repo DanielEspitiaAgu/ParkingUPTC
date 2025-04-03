@@ -5,6 +5,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -29,12 +30,14 @@ public class View extends JFrame implements ActionListener{
     private JPanel receptionistMenuPanel;
     private JPanel adminMenuPanel;
     private JPanel sectionPanel;
+    private JOptionPane jOptionPane;
 
     public View(){
         super("Parking UPTC");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getContentPane().setLayout(new CardLayout());
+        jOptionPane = new JOptionPane();
         createLoginPanel();
         createSectionPanel();
         //JTextField textField = new JTextField();
@@ -101,10 +104,14 @@ public class View extends JFrame implements ActionListener{
         receptionistMenuPanel.setLayout(new GridBagLayout());
         GridBagConstraints config = new GridBagConstraints();
 
-        JButton vehicleEntryButton = new JButton("Ingresó de  vehículo");
+        JButton vehicleEntryButton = new JButton("Ingreso de vehiculo");
+        vehicleEntryButton.addActionListener(this);
         JButton vehicleExitButton = new JButton("Salida de vehículo");
+        vehicleEntryButton.addActionListener(this);
         JButton disponibleSpaces = new JButton("Espacios disponibles");
+        disponibleSpaces.addActionListener(this);
         JButton logOutButton = new JButton("Cerrar sesión");
+        logOutButton.addActionListener(this);
         JPanel buttonBar = new JPanel();
         buttonBar.setLayout(new BoxLayout(buttonBar, BoxLayout.X_AXIS));
         buttonBar.add(vehicleEntryButton);
@@ -160,30 +167,83 @@ public class View extends JFrame implements ActionListener{
 
         config.gridx = 0;
         config.gridy = 0;
-        config.gridwidth = 2;
-        config.insets = new Insets(10, 10, 5, 10);
+        config.insets = new Insets(10, 10, 10, 10);
         config.anchor = GridBagConstraints.CENTER;
         vehicleEntryPanel.add(new JLabel("Plazas disponibles: "+ disponibleSpaces));
 
-        config.gridx = 0;
         config.gridy = 1;
-        config.gridwidth = 1;
-        config.insets = new Insets(10, 10, 5, 10);
         config.anchor = GridBagConstraints.CENTER;
-        vehicleEntryPanel.add(new JLabel("Digite la placa del vehículo que ingresa: "));
+        vehicleEntryPanel.add(new JLabel("Digite la placa del vehículo que ingresa: "), config);
 
-        config.gridx = 1;
-        config.gridy = 1;
+        config.gridx = 0;
+        config.gridy = 2;
         config.anchor = GridBagConstraints.CENTER;
         vehicleEntryPanel.add(new TextField(20), config);
 
-        config.gridx = 0;
         config.gridy = 3;
         config.gridwidth = 2;
         config.anchor = GridBagConstraints.CENTER;
-        vehicleEntryPanel.add(new JButton("Ingresar"), config);
+        JButton generateTicketButton = new JButton("Generar ticket");
+        generateTicketButton.addActionListener(this);
+        vehicleEntryPanel.add(generateTicketButton, config);
 
         sectionPanel.add(vehicleEntryPanel, "Vehicle Entry Panel");
+    }
+
+    private void createGenerateEntryTicketPanel(String parkingName, String date, String vehicle, String entryHour){
+        JPanel generateEntryTicketPanel = new JPanel();
+        generateEntryTicketPanel.setLayout(new GridBagLayout());
+        GridBagConstraints config = new GridBagConstraints();
+
+        config.gridx = 0;
+        config.gridy = 0;
+        config.gridwidth = 2;
+        config.insets = new Insets(10, 10, 10, 10);
+        config.anchor = GridBagConstraints.CENTER;
+        generateEntryTicketPanel.add(new JLabel("Se ha registrado el vehículo con éxito"), config);
+
+        JPanel entryTicketPanel = new JPanel();
+        entryTicketPanel.setLayout(new GridBagLayout());
+        entryTicketPanel.setBorder(new MatteBorder(2, 2, 2, 2, Color.BLACK));
+
+        config.gridx = 0;
+        config.gridy = 0;
+        config.gridwidth = 1;
+        config.insets = new Insets(10, 10, 10, 10);
+        config.anchor = GridBagConstraints.CENTER;
+        entryTicketPanel.add(new JLabel(""+parkingName), config);
+
+        entryTicketPanel.setLayout(new GridBagLayout());
+        config.gridy = 1;
+        config.anchor = GridBagConstraints.CENTER;
+        entryTicketPanel.add(new JLabel("Fecha: "+ date), config);
+
+        config.gridy = 2;
+        config.anchor = GridBagConstraints.CENTER;
+        entryTicketPanel.add(new JLabel("Vehículo: "+ vehicle), config);
+
+        config.gridy = 3;
+        config.anchor = GridBagConstraints.CENTER;
+        entryTicketPanel.add(new JLabel("Hora: "+ entryHour), config);
+        
+        config.gridy = 1;
+        config.gridwidth = 2;
+        generateEntryTicketPanel.add(entryTicketPanel, config);
+
+        config.gridy = 2;
+        config.anchor = GridBagConstraints.CENTER;
+        config.gridwidth = 1;
+        JButton printTicketButton = new JButton("Imprimir ticket");
+        printTicketButton.addActionListener(this);
+        generateEntryTicketPanel.add(printTicketButton, config);
+
+        config.gridx = 1;
+        config.anchor = GridBagConstraints.CENTER;
+        JButton anotherVehicleButton= new JButton("Ingresar otro vehículo");
+        anotherVehicleButton.addActionListener(this);
+        generateEntryTicketPanel.add(anotherVehicleButton, config);
+
+        sectionPanel.add(generateEntryTicketPanel, "Generate Entry Ticket Panel");
     }
 
     private void createVehicleExitPanel(){
@@ -253,7 +313,7 @@ public class View extends JFrame implements ActionListener{
             if (component instanceof JPanel) {
                 for (Component component2 : ((JPanel)(component)).getComponents()) {
                     if (component2 instanceof JButton) {
-                        if (((JButton)(e.getSource())).getText()=="Ingresó de vehículo") {
+                        if (((JButton)(e.getSource())).getText()=="Ingreso de vehiculo") {
                             createVehicleEntryPanel(213123);
                             ((CardLayout)(sectionPanel).getLayout()).show(sectionPanel, "Vehicle Entry Panel");
                         }
@@ -299,5 +359,31 @@ public class View extends JFrame implements ActionListener{
                 }
             }
         }
+        for (Component component : sectionPanel.getComponents()) {
+            if (component instanceof JPanel) {
+                for (Component component2 : ((JPanel)(component)).getComponents()) {
+                    if (component2 instanceof JButton) {
+                        if (((JButton)(e.getSource())).getText()=="Generar ticket") {
+                            createGenerateEntryTicketPanel("Parking", "18/04/2025", "ADC123", "3:40");
+                            ((CardLayout)(sectionPanel).getLayout()).show(sectionPanel, "Generate Entry Ticket Panel");
+                        }
+                        if (((JButton)(e.getSource())).getText()=="Imprimir ticket") {
+                            JOptionPane.showMessageDialog(sectionPanel, "El ticket se ha impreso con exito");
+                        }
+                        if (((JButton)(e.getSource())).getText()=="Ingresar otro vehículo") {
+                            ((CardLayout)(sectionPanel).getLayout()).show(sectionPanel, "Vehicle Entry Panel");
+                        }
+                        if (((JButton)(e.getSource())).getText()=="") {
+                    
+                        }
+                        if (((JButton)(e.getSource())).getText()=="") {
+                    
+                        }else{
+                            continue;
+                        }
+                    }
+                }
+        }
     }
+}
 }
