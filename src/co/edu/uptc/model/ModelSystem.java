@@ -15,6 +15,12 @@ public class ModelSystem {
         this.parking = null;
         this.admin = new Admin("0001", "admin@uptc.edu.co", "123abc", "Pedrito", "Me electrocutaste");
         this.tickets = new ArrayList<Ticket>();
+
+        receptionists.add(new Receptionist("001", "ana.gomez@example.com", "pass123", "Ana", "Gómez", "555-1234", "Calle 10 #45-67"));
+        receptionists.add(new Receptionist("002", "mario.luna@example.com", "secure456", "Mario", "Luna", "555-5678", "Carrera 12 #34-89"));
+        receptionists.add(new Receptionist("003", "lucia.mendez@example.com", "clave789", "Lucía", "Méndez", "555-8765", "Avenida Siempre Viva 123"));
+        receptionists.add(new Receptionist("004", "carlos.rios@example.com", "admin321", "Carlos", "Ríos", "555-4321", "Diagonal 25 #98-54"));
+        receptionists.add(new Receptionist("005", "sofia.vega@example.com", "pass987", "Sofía", "Vega", "555-6789", "Transversal 45 #76-32"));
     }
 
     public ArrayList<String> getReceptionistList(){
@@ -187,11 +193,14 @@ public class ModelSystem {
         return true;
     }
     
-    public boolean editReceptionist(String id, String document, String password) {
+    public boolean editReceptionist(String id, String newId, String password) {
         for(Receptionist reseptionist:receptionists){
             if(reseptionist.getIdNumber().equals(id)){
+                if(reseptionist.getPassword().equals(password)){
+                    return false;
+                }
                 reseptionist.setPassword(password);
-                reseptionist.setIdNumber(document);
+                reseptionist.setIdNumber(newId);
                 return true;
             }
         }

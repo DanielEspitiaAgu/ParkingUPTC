@@ -12,19 +12,13 @@ public final class Presenter {
     private View view;
 
     private Presenter() {
-
         this.modelSystem = new ModelSystem();
         this.view = new View();
     }
 
     public void login(String idNumber, String password) {
-           view.showReceptionistMenu("Mandarina");
- //       if (modelSystem.login(idNumber, password)==1){
-   //     }else if (modelSystem.login(idNumber, password)==2){
-     //       view.showAdminMenu(modelSystem.getUserName());
-      //  }else{
-        //    view.showErrorMessage("Error","Usuario o contraseña incorrectos");
-        //}
+            view.showAdminMenu("");
+        
     }
 
     public void generateTicket(String plate) {
@@ -56,6 +50,18 @@ public final class Presenter {
 
     public ArrayList<String> getReceptionistList(){
         return modelSystem.getReceptionistList();
+    }
+
+    public void consultTicket(String plate){
+        view.showGenerateExitTicketPanel(plate, modelSystem.searchCost(plate));
+    }
+
+    public void modifyReceptionist(String id, String newId, String password){
+        if(modelSystem.editReceptionist(id, newId, password)){
+            view.showErrorMessage("Error", "No se pudo modificar el recepcionista.");
+        }else{
+            view.showSimpleMessage("Modificación Exitosa", "El correo para facilitar el uso de las nuevas credenciales para el recepcionista se ha enviado.\n"+modelSystem.getReceptionistInfo(newId));
+        }
     }
 
 }

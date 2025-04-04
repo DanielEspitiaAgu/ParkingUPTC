@@ -15,11 +15,14 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import co.edu.uptc.presenter.Presenter;
 
 import java.util.ArrayList;
+import java.util.regex.PatternSyntaxException;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -320,16 +323,21 @@ public class View extends JFrame{
     
         config.gridx = 0;
         config.gridy = 0;
-        config.gridwidth = 2;
+        config.gridwidth = 1;
         exitVehiclePanel.add(new JLabel("Digite la placa del vehículo que desea salir: "), config);
     
         config.gridy = 1;
-        config.gridwidth = 1;
         JTextField plateField = new JTextField(20);
         exitVehiclePanel.add(plateField, config);
     
         config.gridy = 2;
         JButton consultButton = new JButton("Consultar");
+        consultButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Presenter.getInstance().consultTicket(plateField.getText());
+            }
+        });
         exitVehiclePanel.add(consultButton, config);
     
         receptionistSectionPanel.add(exitVehiclePanel, "Vehicle Exit Panel");
@@ -810,8 +818,24 @@ public class View extends JFrame{
         JLabel selectLabel = new JLabel("Seleccione el recepcionista:");
         editReceptionistPanel.add(selectLabel, config);
     
+        config.gridx = 0;
+        config.gridy = 3;
+        editReceptionistPanel.add(new JSeparator(), config);
+        
+        config.gridy = 4;
+        JLabel modifyLabel = new JLabel("Digite los datos a modificar del recepcionista: ");
+        editReceptionistPanel.add(modifyLabel, config);
+        
         config.gridy = 1;
-        JList<String> receptionistDropdown = new JList<>(Presenter.getInstance().getReceptionistList().toArray(new String[0]));
+        JList<String> receptionistDropdown = new JList<>(new String[]{"ingrese un nombre"});
+        receptionistDropdown.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                modifyLabel.setText("Digite los datos a modificar del recepcionista ("+receptionistDropdown.getSelectedValue()+"): ");
+            }
+            
+        });
+        receptionistDropdown.setEnabled(false);
         JScrollPane scrollPane = new JScrollPane(receptionistDropdown);
         scrollPane.setPreferredSize(new Dimension(200, 70));
         editReceptionistPanel.add(scrollPane, config);
@@ -828,19 +852,10 @@ public class View extends JFrame{
         nameField.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
             public void onChange(DocumentEvent e) {
-                
+                uptdateList(nameField.getText(), receptionistDropdown);
             }
         });
         editReceptionistPanel.add(nameField, config);
-
-        config.gridx = 0;
-        config.gridy = 3;
-        config.gridwidth = 2;
-        editReceptionistPanel.add(new JSeparator(), config);
-    
-        config.gridy = 4;
-        JLabel modifyLabel = new JLabel("Digite los datos a modificar del recepcionista:");
-        editReceptionistPanel.add(modifyLabel, config);
 
         config.gridy = 5;
         config.gridx = 0;
@@ -851,6 +866,7 @@ public class View extends JFrame{
         config.gridx = 1;
         config.anchor = GridBagConstraints.LINE_START;
         JTextField documentField = new JTextField(20);
+        documentField.setText("[0-9]+");
         editReceptionistPanel.add(documentField, config);
 
         config.gridy = 6;
@@ -859,14 +875,16 @@ public class View extends JFrame{
     
         config.gridx = 1;
         JPasswordField passwordField = new JPasswordField(20);
+        passwordField.setText(".{8,}");
         editReceptionistPanel.add(passwordField, config);
-
+        
         config.gridy = 7;
         config.gridx = 0;
         editReceptionistPanel.add(new JLabel("Confirmar contraseña:"), config);
-    
+        
         config.gridx = 1;
         JPasswordField confirmPasswordField = new JPasswordField(20);
+        confirmPasswordField.setText(".{8,}");
         editReceptionistPanel.add(confirmPasswordField, config);
     
         config.gridy = 8;
@@ -878,6 +896,25 @@ public class View extends JFrame{
         config.gridy = 9;
         config.anchor = GridBagConstraints.CENTER;
         JButton acceptButton = new JButton("Aceptar");
+        ButtonSummitControl acceptSummitControl = new ButtonSummitControl(acceptButton, editReceptionistPanel);
+        acceptButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (passwordField.getText().equals(confirmPasswordField.getText())) {
+                    try{
+                        String[] trim = receptionistDropdown.getSelectedValue().split(":");
+                        Presenter.getInstance().modifyReceptionist(trim[1], documentField.getText(), passwordField.getText());
+                    }catch (PatternSyntaxException ex){
+                        showErrorMessage("Error", "Debe escoger un recepcionista.");
+                    }catch (NullPointerException ex){
+                        showErrorMessage("Error", "Debe escoger un recepcionista.");
+                    }
+                }else{
+                    showErrorMessage("Error", "Las contraseñas no coinciden.");
+                }
+            }
+            
+        });
         editReceptionistPanel.add(acceptButton, config);
     
         adminSectionPanel.add(editReceptionistPanel, "Edit Receptionist Panel");
@@ -903,6 +940,11 @@ public class View extends JFrame{
         ((CardLayout)(receptionistSectionPanel.getLayout())).show(receptionistSectionPanel, "Generate Entry Ticket Panel");
     }
 
+    public void showGenerateExitTicketPanel(String date, double cost){
+        createGenerateExitTicketPanel(date, cost);
+        ((CardLayout)(receptionistSectionPanel.getLayout())).show(receptionistSectionPanel, "Generate Exit Ticket Panel");
+    }
+
     public void showErrorMessage(String title, String message){
         JOptionPane.showMessageDialog(getContentPane(), message, title, JOptionPane.ERROR_MESSAGE);
     }
@@ -911,7 +953,7 @@ public class View extends JFrame{
         JOptionPane.showMessageDialog(getContentPane(), message, title, JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public void showAdminMenu(String name, JList<String> jList){
+    public void showAdminMenu(String name){
         createInitAdminPanel(name);
         ((CardLayout)(adminSectionPanel.getLayout())).show(adminSectionPanel, "Init Panel");
         ((CardLayout)(getContentPane().getLayout())).show(getContentPane(), "Admin Panel");
