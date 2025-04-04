@@ -2,6 +2,8 @@ package co.edu.uptc.presenter;
 
 import co.edu.uptc.model.ModelSystem;
 import co.edu.uptc.view.View;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public final class Presenter {
@@ -16,17 +18,17 @@ public final class Presenter {
     }
 
     public void login(String idNumber, String password) {
-        if (modelSystem.login(idNumber, password)==1){
-            view.showReceptionistMenu();
-        }else if (modelSystem.login(idNumber, password)==2){
-            view.showAdminMenu(modelSystem.getUserName());
-        }else{
-            view.showErrorMessage("Error","Usuario o contraseña incorrectos");
-        }
+           view.showReceptionistMenu("Mandarina");
+ //       if (modelSystem.login(idNumber, password)==1){
+   //     }else if (modelSystem.login(idNumber, password)==2){
+     //       view.showAdminMenu(modelSystem.getUserName());
+      //  }else{
+        //    view.showErrorMessage("Error","Usuario o contraseña incorrectos");
+        //}
     }
 
-    public void generateTicket(String plate){
-            view.showGenerateEntryTicketPanel(plate);
+    public void generateTicket(String plate) {
+            view.showGenerateEntryTicketPanel("PArkingUPTc", "18/04/2025", plate, "3:40");
     }
 
     public static Presenter getInstance() {
@@ -50,6 +52,10 @@ public final class Presenter {
 
     public String getReceptionistInfo(String idNumber) {
         return modelSystem.getReceptionistInfo(idNumber);
+    }
+
+    public ArrayList<String> getReceptionistList(){
+        return modelSystem.getReceptionistList();
     }
 
 }

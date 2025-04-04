@@ -17,6 +17,14 @@ public class ModelSystem {
         this.tickets = new ArrayList<Ticket>();
     }
 
+    public ArrayList<String> getReceptionistList(){
+        ArrayList<String> receptionistList = new ArrayList<String>();
+        for (Receptionist receptionist : receptionists){
+            receptionistList.add(receptionist.getName()+" "+receptionist.getLastName()+":"+receptionist.getIdNumber());
+        }
+        return receptionistList;
+    }
+
     public String getUserName(){
         System.out.println(currentUser.getName()+" "+currentUser.getLastName());
         return currentUser.getName()+" "+currentUser.getLastName();
