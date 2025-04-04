@@ -158,7 +158,9 @@ public class View extends JFrame{
         logOutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ((CardLayout)(receptionistSectionPanel).getLayout()).show(receptionistSectionPanel, "Login Panel");
+                if(JOptionPane.showConfirmDialog(getContentPane(), "¿Estás seguro de que deseas cerrar sesión?")==JOptionPane.YES_OPTION){
+                    ((CardLayout)(getContentPane()).getLayout()).show(getContentPane(), "Login Panel");  
+                }
             }
         });
         JPanel buttonBar = new JPanel();
@@ -183,6 +185,8 @@ public class View extends JFrame{
 
         createInitReceptionistPanel("Daniel");
         createVehicleEntryPanel(213123);
+        createExitVehiclePanel();
+        createDisponibleSpacesPanel();
         receptionistMenuPanel.add(receptionistSectionPanel, config);
         getContentPane().add(receptionistMenuPanel, "Receptionist Panel");
     }
@@ -292,7 +296,7 @@ public class View extends JFrame{
         printTicketButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ((CardLayout)(receptionistSectionPanel).getLayout()).show(receptionistSectionPanel, "Disponible Spaces Panel");
+                ((CardLayout)(receptionistSectionPanel).getLayout()).show(receptionistSectionPanel, "Generate Entry Ticket Panel");
             }
         });
         generateEntryTicketPanel.add(printTicketButton, config);
@@ -448,9 +452,9 @@ public class View extends JFrame{
         config.gridx = 1;
         JButton anotherVehicleButton = new JButton("Salida de otro Vehículo");
         buttonsPanel.add(anotherVehicleButton, config);
+        receptionistSectionPanel.add(buttonsPanel, "Exit Ticket Buttons Panel");
 
         receptionistSectionPanel.add(exitTicketReceiptPanel, "Exit Ticket Receipt Panel");
-        receptionistSectionPanel.add(buttonsPanel, "Exit Ticket Buttons Panel");
     }
 
     private void createDisponibleSpacesPanel(){
@@ -875,8 +879,6 @@ public class View extends JFrame{
         adminSectionPanel.add(editReceptionistPanel, "Edit Receptionist Panel");
     }
     
-
-    
     public void showLoginPanel(){
         
     }
@@ -884,6 +886,8 @@ public class View extends JFrame{
     public void showReceptionistMenu(){
         ((CardLayout)(getContentPane().getLayout())).show(getContentPane(), "Receptionist Panel");
     }
+
+
 
     public void showVehicleEntryPanel(){
         ((CardLayout)(receptionistSectionPanel.getLayout())).show(receptionistSectionPanel, "Vehicle Entry Panel");
