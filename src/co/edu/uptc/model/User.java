@@ -11,6 +11,8 @@ public class User {
         this.idNumber = idNumber;
         this.email = email;
         this.password = password;
+        this.name = name;
+        this.lastName = lastName;
     }
 
     public String getName() {

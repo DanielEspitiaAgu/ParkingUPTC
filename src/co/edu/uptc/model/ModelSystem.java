@@ -17,6 +17,15 @@ public class ModelSystem {
         this.tickets = new ArrayList<Ticket>();
     }
 
+    public String getUserName(){
+        System.out.println(currentUser.getName()+" "+currentUser.getLastName());
+        return currentUser.getName()+" "+currentUser.getLastName();
+    }
+
+    public String getParkingInfo(){
+        return parking.toString();
+    }
+
     public void setReceptionists(ArrayList<Receptionist> receptionists) {
         this.receptionists = receptionists;
     }
@@ -53,18 +62,20 @@ public class ModelSystem {
         return parking;
     }
 
-    public String logIn(String idNumber, String password) {
+    public int login(String idNumber, String password) {
         for(Receptionist receptionist:receptionists){
             if(receptionist.getIdNumber().equals(idNumber.toLowerCase()) && receptionist.getPassword().equals(password)){
                 currentUser = receptionist;
-                return receptionist.getName()+" "+receptionist.getLastName();
+                return 1;
+                //return receptionist.getName()+" "+receptionist.getLastName();
             }
         }
         if(admin.getIdNumber().equals(idNumber.toLowerCase()) && admin.getPassword().equals(password)){
             currentUser = admin;
-            return admin.getName()+" "+admin.getLastName();
+            return 2;
+            //return admin.getName()+" "+admin.getLastName();
         }
-        return null;
+        return -1;
     }
 
     public void logout(){
@@ -151,15 +162,20 @@ public class ModelSystem {
     public boolean createParking(String name, String address, int capacity, ArrayList<String> scheduleList) {
         if (parking==null) {
             try {
-                parking = new Parking(name, address, capacity,scheduleList);
+                parking = new Parking(name, address, capacity, scheduleList);
                 return true;
             } catch (IllegalArgumentException e) {}
         }
         return false;
     }
 
-    public boolean createReceptionist(String idNumber, String email, String password, String name, String lastName, String phone) {
-        receptionists.add(new Receptionist(idNumber, email, password, name, lastName, phone));
+    public boolean createReceptionist(String idNumber, String email, String password, String name, String lastName, String phone, String adress) {
+        for(Receptionist receptionist:receptionists){
+            if(receptionist.getIdNumber().equals(idNumber)){
+                return false;
+            }
+        }
+        receptionists.add(new Receptionist(idNumber, email, password, name, lastName, phone,adress));
         return true;
     }
     
@@ -173,5 +189,14 @@ public class ModelSystem {
         }
         
         return false;
+    }
+
+    public String getReceptionistInfo(String idNumber) {
+        for(Receptionist receptionist:receptionists){
+            if(receptionist.getIdNumber().equals(idNumber)){
+                return receptionist.toString();
+            }
+        }
+        return "";
     }
 }

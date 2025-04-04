@@ -36,4 +36,9 @@ public class ServiceDaySchedule {
     public void setFinishTime(LocalTime finishTime) {
         this.finishTime = finishTime;
     }
+
+    @Override
+    public String toString() {
+        return day+"-"+startTime.toString()+"-"+finishTime.toString();
+    }
 }

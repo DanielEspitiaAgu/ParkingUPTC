@@ -24,7 +24,7 @@ public class Parking {
         for (int i = 0; i < scheduleList.size(); i++) {
             String[] aspects= scheduleList.get(i).split("-");
             int day = 0;
-            switch (aspects[0]) {
+            switch (aspects[0].trim()) {
                 case "Lunes": day = 1; break;
                 case "Martes": day = 2; break;
                 case "Miercoles": day = 3; break;
@@ -35,7 +35,7 @@ public class Parking {
                 case "Festivo": day = 8; break;
                 default: throw new IllegalArgumentException("Invalid day");
             }
-            serviceDaySchedules.add(new ServiceDaySchedule(Integer.parseInt(aspects[0]), LocalTime.parse(aspects[1]), LocalTime.parse(aspects[2])));
+            serviceDaySchedules.add(new ServiceDaySchedule(day, LocalTime.parse(aspects[1].trim()), LocalTime.parse(aspects[2].trim())));
         }
         return serviceDaySchedules;
     }
@@ -79,4 +79,12 @@ public class Parking {
     public void setSchedule(ArrayList<ServiceDaySchedule> schedule) {
         this.schedule = schedule;
     }
+
+    @Override
+    public String toString() {
+        return "Parking [name=" + name + ", address=" + address + ", spaces=" + spaces + ", occupiedSpaces="
+                + occupiedSpaces + ", schedule=" + schedule.toString() + "]";
+    }
+
+    
 }
