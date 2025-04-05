@@ -26,11 +26,19 @@ public final class Presenter {
         } else{
             view.showErrorMessage("Error", "Usuario o contraseña incorrectos.");
         }
-        
     }
 
     public void generateTicket(String plate) {
-            view.showGenerateEntryTicketPanel("ParkingUPTc", "18/04/2025", plate, "3:40");
+        try{
+            if(modelSystem.registerVehicle(plate)){
+                view.showGenerateEntryTicketPanel(modelSystem.getEntryTicketInformation(plate));
+            }else{
+                view.showErrorMessage("Error", "No se pudo registrar el vehículo, por favor verifique las plazas disponibles o si el vehículo haya salido del parqueadero.");
+            }
+        }
+        catch(NullPointerException ex){
+            view.showErrorMessage("Error", "No existe un parqueadero.");
+        }
     }
 
     public static Presenter getInstance() {

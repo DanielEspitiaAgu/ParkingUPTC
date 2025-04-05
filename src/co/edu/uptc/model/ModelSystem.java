@@ -12,7 +12,7 @@ public class ModelSystem {
 
     public ModelSystem() {
         this.receptionists = new ArrayList<Receptionist>();
-        this.parking = null;
+        this.parking = new Parking("Parking 1", "Calle 10 #45-67", 10, new ArrayList<String>());
         this.admin = new Admin("0001", "admin@uptc.edu.co", "123abc", "Pedrito", "Me electrocutaste");
         this.tickets = new ArrayList<Ticket>();
 
@@ -29,6 +29,15 @@ public class ModelSystem {
             receptionistList.add(receptionist.getName()+" "+receptionist.getLastName()+":"+receptionist.getIdNumber());
         }
         return receptionistList;
+    }
+
+    public ArrayList<String> getEntryTicketInformation(String plate){
+        for(Ticket ticket:tickets){
+            if(ticket.getVehicleNumberPlate().equals(plate)){
+                return ticket.generateEntryTicket(parking.getName());
+            }
+        }
+        return null;
     }
 
     public int getFreeParkingSpaces(){
@@ -148,7 +157,10 @@ public class ModelSystem {
     public boolean registerVehicle(String plateNumber){
         if(consultIncompleteTicket(plateNumber)==null){
             try{
+                if (parking.getOcupedParks()==parking.getSpaces())
+                    return false;
                 tickets.add(new Ticket(LocalDateTime.now(),plateNumber,(Receptionist)currentUser));
+                parking.setOcupedParks(parking.getOcupedParks()+1);
                 return true;
             }catch (NullPointerException e){}
             catch (ClassCastException e){}

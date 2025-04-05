@@ -78,8 +78,8 @@ public class Ticket {
     public ArrayList<String> generateEntryTicket(String pakingName) {
         ArrayList<String> entryTicket = new ArrayList<String>();
         entryTicket.add(pakingName);
-        entryTicket.add(vehicleNumberPlate);
         entryTicket.add(entryDate.getDayOfMonth() + "/" + entryDate.getMonth() + "/" + entryDate.getYear());
+        entryTicket.add(vehicleNumberPlate);
         entryTicket.add(entryDate.getHour() + ":" + entryDate.getMinute());
         return entryTicket;
     }

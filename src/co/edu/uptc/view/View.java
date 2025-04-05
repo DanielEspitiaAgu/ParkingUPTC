@@ -40,6 +40,8 @@ public class View extends JFrame{
     private JPanel adminSectionPanel;
     private JPanel reportPanel;
     private JOptionPane jOptionPane;
+    private JLabel disponibleSpacesLabel;
+    private JLabel disponibleSpacesLabel2;
 
     public View(){
         super("Parking UPTC");
@@ -47,6 +49,8 @@ public class View extends JFrame{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getContentPane().setLayout(new CardLayout());
         jOptionPane = new JOptionPane();
+        disponibleSpacesLabel = new JLabel();
+        disponibleSpacesLabel2 = new JLabel();
         createLoginPanel();
         createAdminMenuPanel();
         createReceptionistMenuPanel();
@@ -132,17 +136,15 @@ public class View extends JFrame{
         receptionistMenuPanel = new JPanel();
         receptionistMenuPanel.setLayout(new GridBagLayout());
         GridBagConstraints config = new GridBagConstraints();
-        JLabel disponibleSpacesLabel = new JLabel();
 
         JButton vehicleEntryButton = new JButton("Ingreso de vehiculo");
         vehicleEntryButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                disponibleSpacesLabel.setText("Plazas disponibles: "+Presenter.getInstance().getFreeSpaces());
                 ((CardLayout)(receptionistSectionPanel).getLayout()).show(receptionistSectionPanel, "Vehicle Entry Panel");
-                if(Presenter.getInstance().getFreeSpaces()<5)
-                    showSimpleMessage("Advertencia", "Quedan menos de 5 plazas disponibles.");
+                updatedisponibleSpacesLabel();
             }
+            
         });
         JButton vehicleExitButton = new JButton("Salida de vehículo");
         vehicleExitButton.addActionListener(new ActionListener() {
@@ -154,8 +156,9 @@ public class View extends JFrame{
         JButton disponibleSpaces = new JButton("Espacios disponibles");
         disponibleSpaces.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) {   
                 ((CardLayout)(receptionistSectionPanel).getLayout()).show(receptionistSectionPanel, "Disponible Spaces Panel");
+                updatedisponibleSpacesLabel();
             }
         });
         JButton logOutButton = new JButton("Cerrar sesión");
@@ -188,14 +191,14 @@ public class View extends JFrame{
         config.insets = new Insets(5, 10, 10, 10);
 
         createReceptionistSectionPanel();
-        createVehicleEntryPanel(disponibleSpacesLabel);
+        createVehicleEntryPanel();
         createExitVehiclePanel();
         createDisponibleSpacesPanel();
         receptionistMenuPanel.add(receptionistSectionPanel, config);
         getContentPane().add(receptionistMenuPanel, "Receptionist Panel");
     }
 
-    private void createVehicleEntryPanel(JLabel disponibleSpaces){
+    private void createVehicleEntryPanel(){
         JPanel vehicleEntryPanel = new JPanel();
         vehicleEntryPanel.setLayout(new GridBagLayout());
         GridBagConstraints config = new GridBagConstraints();
@@ -204,7 +207,7 @@ public class View extends JFrame{
         config.gridy = 0;
         config.insets = new Insets(10, 10, 10, 10);
         config.anchor = GridBagConstraints.CENTER;
-        vehicleEntryPanel.add(disponibleSpaces, config);
+        vehicleEntryPanel.add(disponibleSpacesLabel, config);
 
         config.gridy = 1;
         config.anchor = GridBagConstraints.CENTER;
@@ -213,7 +216,9 @@ public class View extends JFrame{
         config.gridx = 0;
         config.gridy = 2;
         config.anchor = GridBagConstraints.CENTER;
-        vehicleEntryPanel.add(new JTextField(20), config);
+        JTextField vehicleEntry = new JTextField(20);
+        vehicleEntry.setText("[A-Z]{3}(\\d{3}|\\d{2}[A-Z])");
+        vehicleEntryPanel.add(vehicleEntry, config);
 
         config.gridy = 3;
         config.gridwidth = 2;
@@ -223,7 +228,8 @@ public class View extends JFrame{
         generateTicketButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Presenter.getInstance().generateTicket("ABC123");
+                Presenter.getInstance().generateTicket(vehicleEntry.getText());
+                vehicleEntry.setText("");
             }
         });
         vehicleEntryPanel.add(generateTicketButton, config);
@@ -231,7 +237,7 @@ public class View extends JFrame{
         receptionistSectionPanel.add(vehicleEntryPanel, "Vehicle Entry Panel");
     }
 
-    private void createGenerateEntryTicketPanel(String parkingName, String date, String vehicle, String entryHour){
+    private void createGenerateEntryTicketPanel(ArrayList<String> ticketInformation) {
         JPanel generateEntryTicketPanel = new JPanel();
         generateEntryTicketPanel.setLayout(new GridBagLayout());
         GridBagConstraints config = new GridBagConstraints();
@@ -252,20 +258,20 @@ public class View extends JFrame{
         config.gridwidth = 1;
         config.insets = new Insets(10, 10, 10, 10);
         config.anchor = GridBagConstraints.CENTER;
-        entryTicketPanel.add(new JLabel(""+parkingName), config);
+        entryTicketPanel.add(new JLabel(""+ticketInformation.get(0)), config);
 
         entryTicketPanel.setLayout(new GridBagLayout());
         config.gridy = 1;
         config.anchor = GridBagConstraints.CENTER;
-        entryTicketPanel.add(new JLabel("Fecha: "+ date), config);
+        entryTicketPanel.add(new JLabel("Fecha: "+ ticketInformation.get(1)), config);
 
         config.gridy = 2;
         config.anchor = GridBagConstraints.CENTER;
-        entryTicketPanel.add(new JLabel("Vehículo: "+ vehicle), config);
+        entryTicketPanel.add(new JLabel("Vehículo: "+ ticketInformation.get(2)), config);
 
         config.gridy = 3;
         config.anchor = GridBagConstraints.CENTER;
-        entryTicketPanel.add(new JLabel("Hora: "+ entryHour), config);
+        entryTicketPanel.add(new JLabel("Hora: "+ ticketInformation.get(3)), config);
         
         config.gridy = 1;
         config.gridwidth = 2;
@@ -278,7 +284,7 @@ public class View extends JFrame{
         printTicketButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ((CardLayout)(receptionistSectionPanel).getLayout()).show(receptionistSectionPanel, "Generate Entry Ticket Panel");
+                showSimpleMessage("Impresora", "Se ha impreso el ticket.");
             }
         });
         generateEntryTicketPanel.add(printTicketButton, config);
@@ -289,7 +295,8 @@ public class View extends JFrame{
         anotherVehicleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ((CardLayout)(receptionistSectionPanel).getLayout()).show(receptionistSectionPanel, "Disponible Spaces Panel");
+                updatedisponibleSpacesLabel();
+                ((CardLayout)(receptionistSectionPanel).getLayout()).show(receptionistSectionPanel, "Vehicle Entry Panel");
             }
         });
         generateEntryTicketPanel.add(anotherVehicleButton, config);
@@ -444,7 +451,17 @@ public class View extends JFrame{
     }
 
     private void createDisponibleSpacesPanel(){
+        JPanel disponibleSpacesPanel = new JPanel();
+        disponibleSpacesPanel.setLayout(new GridBagLayout());
+        GridBagConstraints config = new GridBagConstraints();
+        config.insets = new Insets(5, 5, 5, 5);
 
+        config.gridx = 0;
+        config.gridy = 0;
+        config.gridwidth = 2;
+        disponibleSpacesPanel.add(disponibleSpacesLabel2, config);
+
+        receptionistSectionPanel.add(disponibleSpacesPanel, "Disponible Spaces Panel");
     }
 
     //UwU
@@ -1038,8 +1055,8 @@ public class View extends JFrame{
         ((CardLayout)(receptionistSectionPanel.getLayout())).show(receptionistSectionPanel, "Vehicle Entry Panel");
     }
 
-    public void showGenerateEntryTicketPanel(String parkingName, String date, String vehicle, String entryHour){
-        createGenerateEntryTicketPanel(parkingName, date, vehicle, entryHour);
+    public void showGenerateEntryTicketPanel(ArrayList<String> entryTicketInfo){
+        createGenerateEntryTicketPanel(entryTicketInfo);
         ((CardLayout)(receptionistSectionPanel.getLayout())).show(receptionistSectionPanel, "Generate Entry Ticket Panel");
     }
 
@@ -1054,6 +1071,10 @@ public class View extends JFrame{
 
     public void showSimpleMessage(String title, String message){
         JOptionPane.showMessageDialog(getContentPane(), message, title, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void showWarningMessage(String title, String message){
+        JOptionPane.showMessageDialog(getContentPane(), message, title, JOptionPane.WARNING_MESSAGE);
     }
 
     public void showAdminMenu(String greeting){
@@ -1087,5 +1108,10 @@ public class View extends JFrame{
         }
     }
 
-
+    private void updatedisponibleSpacesLabel(){
+        disponibleSpacesLabel.setText("El número de plazas disponibles es: "+Presenter.getInstance().getFreeSpaces());
+        disponibleSpacesLabel2.setText("El número de plazas disponibles es: "+Presenter.getInstance().getFreeSpaces());
+        if(Presenter.getInstance().getFreeSpaces()<5)
+            showWarningMessage("Advertencia", "Quedan menos de 5 plazas disponibles.");
+    }
 }
