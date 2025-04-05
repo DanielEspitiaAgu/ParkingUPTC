@@ -30,7 +30,7 @@ public final class Presenter {
     }
 
     public void generateTicket(String plate) {
-            view.showGenerateEntryTicketPanel("PArkingUPTc", "18/04/2025", plate, "3:40");
+            view.showGenerateEntryTicketPanel("ParkingUPTc", "18/04/2025", plate, "3:40");
     }
 
     public static Presenter getInstance() {
@@ -81,6 +81,10 @@ public final class Presenter {
 
     public String[][] generateReceptionistReport(LocalDate date){  
         return modelSystem.generateReceptionistReport(date);
+    }
+
+    public int getFreeSpaces(){
+        return modelSystem.getFreeParkingSpaces();
     }
 
 }

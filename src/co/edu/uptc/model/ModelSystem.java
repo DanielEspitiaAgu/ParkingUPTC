@@ -31,6 +31,12 @@ public class ModelSystem {
         return receptionistList;
     }
 
+    public int getFreeParkingSpaces(){
+        if (parking!=null)
+            return parking.getSpaces()-parking.getOcupedParks();
+        return 0;
+    }
+
     public String getUserName(){
         System.out.println(currentUser.getName()+" "+currentUser.getLastName());
         return currentUser.getName()+" "+currentUser.getLastName();

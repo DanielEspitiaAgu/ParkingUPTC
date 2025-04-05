@@ -132,12 +132,16 @@ public class View extends JFrame{
         receptionistMenuPanel = new JPanel();
         receptionistMenuPanel.setLayout(new GridBagLayout());
         GridBagConstraints config = new GridBagConstraints();
+        JLabel disponibleSpacesLabel = new JLabel();
 
         JButton vehicleEntryButton = new JButton("Ingreso de vehiculo");
         vehicleEntryButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                disponibleSpacesLabel.setText("Plazas disponibles: "+Presenter.getInstance().getFreeSpaces());
                 ((CardLayout)(receptionistSectionPanel).getLayout()).show(receptionistSectionPanel, "Vehicle Entry Panel");
+                if(Presenter.getInstance().getFreeSpaces()<5)
+                    showSimpleMessage("Advertencia", "Quedan menos de 5 plazas disponibles.");
             }
         });
         JButton vehicleExitButton = new JButton("Salida de vehículo");
@@ -184,14 +188,14 @@ public class View extends JFrame{
         config.insets = new Insets(5, 10, 10, 10);
 
         createReceptionistSectionPanel();
-        createVehicleEntryPanel(213123);
+        createVehicleEntryPanel(disponibleSpacesLabel);
         createExitVehiclePanel();
         createDisponibleSpacesPanel();
         receptionistMenuPanel.add(receptionistSectionPanel, config);
         getContentPane().add(receptionistMenuPanel, "Receptionist Panel");
     }
 
-    private void createVehicleEntryPanel(int disponibleSpaces){
+    private void createVehicleEntryPanel(JLabel disponibleSpaces){
         JPanel vehicleEntryPanel = new JPanel();
         vehicleEntryPanel.setLayout(new GridBagLayout());
         GridBagConstraints config = new GridBagConstraints();
@@ -200,7 +204,7 @@ public class View extends JFrame{
         config.gridy = 0;
         config.insets = new Insets(10, 10, 10, 10);
         config.anchor = GridBagConstraints.CENTER;
-        vehicleEntryPanel.add(new JLabel("Plazas disponibles: "+ disponibleSpaces));
+        vehicleEntryPanel.add(disponibleSpaces, config);
 
         config.gridy = 1;
         config.anchor = GridBagConstraints.CENTER;
