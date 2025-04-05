@@ -81,13 +81,11 @@ public class ModelSystem {
             if(receptionist.getIdNumber().equals(idNumber.toLowerCase()) && receptionist.getPassword().equals(password)){
                 currentUser = receptionist;
                 return 1;
-                //return receptionist.getName()+" "+receptionist.getLastName();
             }
         }
         if(admin.getIdNumber().equals(idNumber.toLowerCase()) && admin.getPassword().equals(password)){
             currentUser = admin;
             return 2;
-            //return admin.getName()+" "+admin.getLastName();
         }
         return -1;
     }
@@ -96,7 +94,7 @@ public class ModelSystem {
         currentUser = null;
     }
 
-    public ArrayList<String> generateParkingReport(LocalDate date){
+    public String[] generateParkingReport(LocalDate date){
         ArrayList<String> reports = new ArrayList<String>();
         int numCars = 0;
         double totalIncome = 0;
@@ -109,10 +107,10 @@ public class ModelSystem {
         }
         reports.add(totalIncome+"");
         reports.add(numCars+"");
-        return reports;
+        return reports.toArray(new String[reports.size()]);
     }
     
-    public ArrayList<ArrayList<String>> generateReceptionistReport(LocalDate date){
+    public String[][] generateReceptionistReport(LocalDate date){
         ArrayList<ArrayList<String>> receptionistReports = new ArrayList<ArrayList<String>>();
         for(Receptionist receptionist:receptionists){
             ArrayList<String> receptionistReport = new ArrayList<String>();
@@ -133,7 +131,12 @@ public class ModelSystem {
             receptionistReport.add(numCars+"");
             receptionistReports.add(receptionistReport);
         }
-        return receptionistReports;
+
+        String[][] reports = new String[receptionistReports.size()][receptionistReports.get(0).size()];
+        for(int i = 0; i < receptionistReports.size(); i++){
+            reports[i] = receptionistReports.get(i).toArray(new String[receptionistReports.get(0).size()]);
+        }
+        return reports;
     }
 
     public boolean registerVehicle(String plateNumber){
@@ -184,6 +187,8 @@ public class ModelSystem {
     }
 
     public boolean createReceptionist(String idNumber, String email, String password, String name, String lastName, String phone, String adress) {
+        if(parking==null)
+            return false;
         for(Receptionist receptionist:receptionists){
             if(receptionist.getIdNumber().equals(idNumber)){
                 return false;

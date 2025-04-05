@@ -4,6 +4,7 @@ import co.edu.uptc.model.ModelSystem;
 import co.edu.uptc.view.View;
 
 import java.lang.reflect.Array;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public final class Presenter {
@@ -17,7 +18,14 @@ public final class Presenter {
     }
 
     public void login(String idNumber, String password) {
-            view.showAdminMenu("");
+        int result = modelSystem.login(idNumber, password);
+        if (result == 1) {
+            view.showReceptionistMenu("Recepcionista: "+modelSystem.getUserName());
+        } else if (result == 2) {
+            view.showAdminMenu("Administrador: "+modelSystem.getUserName());
+        } else{
+            view.showErrorMessage("Error", "Usuario o contraseña incorrectos.");
+        }
         
     }
 
@@ -62,6 +70,17 @@ public final class Presenter {
         }else{
             view.showSimpleMessage("Modificación Exitosa", "El correo para facilitar el uso de las nuevas credenciales para el recepcionista se ha enviado.\n"+modelSystem.getReceptionistInfo(newId));
         }
+    }
+
+    public void generateReport(LocalDate date){
+        view.createReportPanel(date);
+    }
+    public String[] generateParkingReport(LocalDate date){ 
+        return modelSystem.generateParkingReport(date);
+    }
+
+    public String[][] generateReceptionistReport(LocalDate date){  
+        return modelSystem.generateReceptionistReport(date);
     }
 
 }

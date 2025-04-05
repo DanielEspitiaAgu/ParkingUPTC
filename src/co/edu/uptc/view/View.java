@@ -18,20 +18,18 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-
+import javax.swing.*;
+import java.awt.*;
+import java.util.Date;
 import co.edu.uptc.presenter.Presenter;
 
 import java.util.ArrayList;
 import java.util.regex.PatternSyntaxException;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 public class View extends JFrame{
 
@@ -40,6 +38,7 @@ public class View extends JFrame{
     private JPanel adminMenuPanel;
     private JPanel receptionistSectionPanel;
     private JPanel adminSectionPanel;
+    private JPanel reportPanel;
     private JOptionPane jOptionPane;
 
     public View(){
@@ -49,7 +48,6 @@ public class View extends JFrame{
         getContentPane().setLayout(new CardLayout());
         jOptionPane = new JOptionPane();
         createLoginPanel();
-        createReceptionistSectionPanel();
         createAdminMenuPanel();
         createReceptionistMenuPanel();
         //JTextField textField = new JTextField();
@@ -70,6 +68,8 @@ public class View extends JFrame{
         adminSectionPanel = new JPanel();
         adminSectionPanel.setLayout(new CardLayout());
         adminSectionPanel.setBorder(new MatteBorder(2, 2, 2, 2, Color.BLACK));
+        reportPanel = new JPanel();
+        adminSectionPanel.add(reportPanel, "Report Panel");
     }
 
     private void createLoginPanel(){
@@ -183,34 +183,12 @@ public class View extends JFrame{
         config.fill = GridBagConstraints.BOTH;
         config.insets = new Insets(5, 10, 10, 10);
 
-        createInitReceptionistPanel("Daniel");
+        createReceptionistSectionPanel();
         createVehicleEntryPanel(213123);
         createExitVehiclePanel();
         createDisponibleSpacesPanel();
         receptionistMenuPanel.add(receptionistSectionPanel, config);
         getContentPane().add(receptionistMenuPanel, "Receptionist Panel");
-    }
-
-    private void createInitReceptionistPanel(String name){
-        JPanel initPanel = new JPanel();
-        initPanel.setLayout(new GridBagLayout());
-        GridBagConstraints config = new GridBagConstraints();
-
-        config.gridx = 0;
-        config.gridy = 0;
-        config.gridwidth = 1;
-        config.insets = new Insets(10, 10, 5, 10);
-        config.anchor = GridBagConstraints.CENTER;
-        initPanel.add(new JLabel("Recepcionista: "+name+", Bienvenido al sistema de ParkingUPTC!"), config);
-
-        config.gridx = 0;
-        config.gridy = 1;
-        config.gridwidth = 1;
-        config.insets = new Insets(10, 10, 5, 10);
-        config.anchor = GridBagConstraints.CENTER;
-        initPanel.add(new JLabel("Señor/a usuario, selecciona alguna de las opciones del menú"), config);
-
-        receptionistSectionPanel.add(initPanel, "Init Panel");
     }
 
     private void createVehicleEntryPanel(int disponibleSpaces){
@@ -497,7 +475,7 @@ public class View extends JFrame{
         generateSalesReportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ((CardLayout)(adminSectionPanel).getLayout()).show(adminSectionPanel, "Generate Sales Report Panel");
+                ((CardLayout)(adminSectionPanel).getLayout()).show(adminSectionPanel, "Select Date Panel");
             }
         });
         JButton logOutButton = new JButton("Cerrar sesión");
@@ -534,12 +512,13 @@ public class View extends JFrame{
         createRegisterParkingPanel();
         createRegisterRecepcionistPanel();
         createEditReceptionistPanel();
+        createSelectDatePanel();
         adminMenuPanel.add(adminSectionPanel, config);
 
         getContentPane().add(adminMenuPanel, "Admin Panel");
     }
 
-    private void createInitAdminPanel(String name){
+    private void updateInitPanel(String greeting, JPanel sectionPanel){
         JPanel initPanel = new JPanel();
         initPanel.setLayout(new GridBagLayout());
         GridBagConstraints config = new GridBagConstraints();
@@ -549,7 +528,7 @@ public class View extends JFrame{
         config.gridwidth = 1;
         config.insets = new Insets(10, 10, 5, 10);
         config.anchor = GridBagConstraints.CENTER;
-        initPanel.add(new JLabel("Administrador: "+name+", Bienvenido al sistema de ParkingUPTC!"), config);
+        initPanel.add(new JLabel(greeting+", Bienvenido al sistema de ParkingUPTC!"), config);
 
         config.gridx = 0;
         config.gridy = 1;
@@ -558,7 +537,7 @@ public class View extends JFrame{
         config.anchor = GridBagConstraints.CENTER;
         initPanel.add(new JLabel("Señor/a usuario, selecciona alguna de las opciones del menú"), config);
 
-        adminSectionPanel.add(initPanel, "Init Panel");
+        sectionPanel.add(initPanel, "Init Panel");
     }
 
     public void createRegisterParkingPanel() {
@@ -796,7 +775,7 @@ public class View extends JFrame{
                     phoneField.setText("");
                     addressField.setText("");
                 }else{
-                    showErrorMessage("Error", "No se pudo registrar el recepcionista.");
+                    showErrorMessage("Error", "No se pudo registrar el recepcionista. Por favor, revise los datos introducidos o compruebe si exite un parqueadero");
                 }
             }
         });
@@ -823,7 +802,7 @@ public class View extends JFrame{
         editReceptionistPanel.add(new JSeparator(), config);
         
         config.gridy = 4;
-        JLabel modifyLabel = new JLabel("Digite los datos a modificar del recepcionista: ");
+        JLabel modifyLabel = new JLabel("<html>Digite los datos a modificar del recepcionista (<font color='red'>debe seleccionar un recepcionista</font></html>): ");
         editReceptionistPanel.add(modifyLabel, config);
         
         config.gridy = 1;
@@ -831,7 +810,9 @@ public class View extends JFrame{
         receptionistDropdown.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                modifyLabel.setText("Digite los datos a modificar del recepcionista ("+receptionistDropdown.getSelectedValue()+"): ");
+                if(receptionistDropdown.getSelectedValue()!=null)
+                    modifyLabel.setText("Digite los datos a modificar del recepcionista ("+receptionistDropdown.getSelectedValue()+"): ");
+                modifyLabel.setText("<html>aDigite los datos a modificar del recepcionista (<font color='red'>debe seleccionar un recepcionista</font>): </html>");
             }
             
         });
@@ -920,16 +901,134 @@ public class View extends JFrame{
         adminSectionPanel.add(editReceptionistPanel, "Edit Receptionist Panel");
     }
     
+    public void createSelectDatePanel() {
+        JPanel selectDatePanel = new JPanel();
+        selectDatePanel.setLayout(new GridBagLayout());
+        GridBagConstraints config = new GridBagConstraints();
+        config.insets = new Insets(5, 5, 5, 5);
+        config.fill = GridBagConstraints.VERTICAL;
+
+        config.gridy = 0;
+        config.gridx = 0;
+        config.gridwidth = 4;
+        JLabel title = new JLabel("Ingrese la fecha para consultar el reporte:");
+        selectDatePanel.add(title, config);
+    
+        config.fill = GridBagConstraints.HORIZONTAL;
+        config.gridy = 1;
+        JLabel selectLabel = new JLabel("Fecha:");
+        selectDatePanel.add(selectLabel, config);
+
+        config.gridwidth = 1;
+        config.gridx = 0;
+        config.gridy = 2;
+        JTextField dayField = new JTextField(20);
+        dayField.setText("(0?[1-9]|[12][0-9]|3[01])");
+        selectDatePanel.add(dayField, config);
+
+        config.gridy = 3;
+        selectDatePanel.add(new JLabel("Día:"), config);
+
+        config.gridy = 2;
+        config.gridx = 1;
+        JTextField monthField = new JTextField(20);
+        monthField.setText("(0?[1-9]|1[0-2])");
+        selectDatePanel.add(monthField, config);
+
+        config.gridy = 3;
+        selectDatePanel.add(new JLabel("Mes:"), config);
+
+
+        config.gridx = 3;
+        config.gridy = 2;
+        JTextField yearField = new JTextField(20);
+        yearField.setText("[0-9][0-9][0-9][0-9]");
+        selectDatePanel.add(yearField, config);
+        
+        config.gridy = 3;
+        selectDatePanel.add(new JLabel("Año:"), config);
+
+        config.gridy = 4;
+        config.gridx = 0;
+        config.gridwidth = 4;
+        config.fill = GridBagConstraints.VERTICAL;
+        JButton button = new JButton("Consultar");
+        ButtonSummitControl buttonSummitControl = new ButtonSummitControl(button, selectDatePanel);
+        button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try{
+                        LocalDate date = LocalDate.of(Integer.parseInt(yearField.getText()), Integer.parseInt(monthField.getText()), Integer.parseInt(dayField.getText()));
+                        createReportPanel(date);
+                        dayField.setText("");
+                        monthField.setText("");
+                        yearField.setText("");
+                    }catch(DateTimeException ex){
+                        showErrorMessage("Error", "La fecha ingresada no es válida.");
+                    }
+                }
+            }
+        );
+        selectDatePanel.add(button, config);
+
+        adminSectionPanel.add(selectDatePanel, "Select Date Panel");
+        
+    }
+    
+
+    public void createReportPanel(LocalDate date) {
+        reportPanel.setLayout(new GridBagLayout());
+        reportPanel.removeAll();
+        
+        GridBagConstraints config = new GridBagConstraints();
+        config.insets = new Insets(5, 5, 5, 5);
+        config.fill = GridBagConstraints.CENTER;
+
+        reportPanel.add(new JLabel("Informe de ventas "+date.getDayOfMonth()+"/"+date.getMonthValue()+"/"+date.getYear()), config);
+        
+        config.gridy = 1;
+        DefaultTableModel tableModelPR = new DefaultTableModel(new String[]{"Total de ingresos", "Número de vehículos"}, 0);
+        JTable parkingReportTable = new JTable(tableModelPR);
+        parkingReportTable.setEnabled(false);
+        tableModelPR.addRow(Presenter.getInstance().generateParkingReport(date));
+        JScrollPane scrollPanePR = new JScrollPane(parkingReportTable);
+        scrollPanePR.setPreferredSize(new Dimension(400, 100));
+        reportPanel.add(scrollPanePR, config);
+
+        config.gridy = 2;
+        DefaultTableModel tableModelRR = new DefaultTableModel(new String[]{"Recepcionista", "Ingresos", "Ingreso de vehículos"}, 0);
+        JTable parkingReceptionistTable = new JTable(tableModelRR);
+        parkingReceptionistTable.setEnabled(false);
+        String[][] receptionistReport = Presenter.getInstance().generateReceptionistReport(date);
+        for(int i = 0; i < receptionistReport.length; i++){
+            tableModelRR.addRow(receptionistReport[i]);
+        }
+        JScrollPane scrollPaneRR = new JScrollPane(parkingReceptionistTable);
+        scrollPaneRR.setPreferredSize(new Dimension(400, 100));
+        reportPanel.add(scrollPaneRR, config);
+
+        config.gridy = 3;
+        JButton acceptButton = new JButton("Aceptar");
+        acceptButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ((CardLayout)(adminSectionPanel.getLayout())).show(adminSectionPanel, "Select Date Panel");
+            }
+        });
+        reportPanel.add(acceptButton, config);
+
+        ((CardLayout)(adminSectionPanel.getLayout())).show(adminSectionPanel, "Report Panel");
+    }
+    
     public void showLoginPanel(){
         
     }
 
-    public void showReceptionistMenu(String name){
-        ((CardLayout)(adminSectionPanel.getLayout())).show(adminSectionPanel, "Init Panel");
+    public void showReceptionistMenu(String greeting){
+        updateInitPanel(greeting, receptionistSectionPanel);
+        ((CardLayout)(receptionistSectionPanel.getLayout())).show(receptionistSectionPanel, "Init Panel");
         ((CardLayout)(getContentPane().getLayout())).show(getContentPane(), "Receptionist Panel");
     }
-
-
 
     public void showVehicleEntryPanel(){
         ((CardLayout)(receptionistSectionPanel.getLayout())).show(receptionistSectionPanel, "Vehicle Entry Panel");
@@ -953,8 +1052,8 @@ public class View extends JFrame{
         JOptionPane.showMessageDialog(getContentPane(), message, title, JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public void showAdminMenu(String name){
-        createInitAdminPanel(name);
+    public void showAdminMenu(String greeting){
+        updateInitPanel(greeting, adminSectionPanel);
         ((CardLayout)(adminSectionPanel.getLayout())).show(adminSectionPanel, "Init Panel");
         ((CardLayout)(getContentPane().getLayout())).show(getContentPane(), "Admin Panel");
     }
