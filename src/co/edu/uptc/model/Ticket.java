@@ -36,7 +36,9 @@ public class Ticket {
     }
 
     public double getCost() {
-        cost = 2000 + Parking.minuteFee*(entryDate.getMinute() - LocalDateTime.now().getMinute());
+        if (!isComplete) {
+            cost = 2000 + Parking.minuteFee*(entryDate.getMinute() - LocalDateTime.now().getMinute());
+        }
         return cost;
     }
 
@@ -84,14 +86,16 @@ public class Ticket {
         return entryTicket;
     }
 
-    public ArrayList<String> generateExitTicket(String pakingName) {
+    public ArrayList<String> generateExitTicket(String parkingName) {
         ArrayList<String> exitTicket = new ArrayList<String>();
-        exitTicket.add(pakingName);
+        exitTicket.add(parkingName);
         exitTicket.add(vehicleNumberPlate);
         exitTicket.add(entryDate.getDayOfMonth() + "/" + entryDate.getMonth() + "/" + entryDate.getYear());
         exitTicket.add(entryDate.getHour() + ":" + entryDate.getMinute());
         exitTicket.add(exitDate.getHour() + ":" + exitDate.getMinute());
         exitTicket.add(cost + "");
+        exitTicket.add(change + "");
+        exitTicket.add((change+cost)+" ");
         
         return exitTicket;
     }

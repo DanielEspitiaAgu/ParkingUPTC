@@ -28,7 +28,11 @@ public final class Presenter {
         }
     }
 
-    public void generateTicket(String plate) {
+    public void logout(){
+        modelSystem.logout();
+    }
+
+    public void generateEntryTicket(String plate) {
         try{
             if(modelSystem.registerVehicle(plate)){
                 view.showGenerateEntryTicketPanel(modelSystem.getEntryTicketInformation(plate));
@@ -39,6 +43,10 @@ public final class Presenter {
         catch(NullPointerException ex){
             view.showErrorMessage("Error", "No existe un parqueadero.");
         }
+    }
+
+    public double getTicketChange(String plate){
+        return modelSystem.getTicketChange(plate);
     }
 
     public static Presenter getInstance() {
@@ -68,8 +76,13 @@ public final class Presenter {
         return modelSystem.getReceptionistList();
     }
 
-    public void consultTicket(String plate){
-        view.showGenerateExitTicketPanel(plate, modelSystem.searchCost(plate));
+    public double vehicleExitCost(String plate){
+        
+        return modelSystem.searchCost(plate);
+    }
+
+    public boolean consolidateVehicleExit(String plate, double recivedAmount){
+        return modelSystem.completeTicket(plate, recivedAmount);
     }
 
     public void modifyReceptionist(String id, String newId, String password){
@@ -93,6 +106,14 @@ public final class Presenter {
 
     public int getFreeSpaces(){
         return modelSystem.getFreeParkingSpaces();
+    }
+
+    public ArrayList<String> generateExitTicket(String plate){
+        return modelSystem.generateExitTicket(plate);
+    }
+
+    public ArrayList<String> generateCurrentReceptionistReport(){
+        return modelSystem.generateCurrentReceptionistReport();
     }
 
 }

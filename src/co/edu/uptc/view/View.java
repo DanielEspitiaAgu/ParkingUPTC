@@ -22,6 +22,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Date;
 import co.edu.uptc.presenter.Presenter;
+import netscape.javascript.JSException;
 
 import java.util.ArrayList;
 import java.util.regex.PatternSyntaxException;
@@ -165,9 +166,8 @@ public class View extends JFrame{
         logOutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(JOptionPane.showConfirmDialog(getContentPane(), "¿Estás seguro de que deseas cerrar sesión?")==JOptionPane.YES_OPTION){
-                    ((CardLayout)(getContentPane()).getLayout()).show(getContentPane(), "Login Panel");  
-                }
+                createCurrentReceptionistReportPanel(Presenter.getInstance().generateCurrentReceptionistReport());
+                ((CardLayout)(receptionistSectionPanel).getLayout()).show(receptionistSectionPanel, "Current Receptionist Report Panel");
             }
         });
         JPanel buttonBar = new JPanel();
@@ -192,7 +192,7 @@ public class View extends JFrame{
 
         createReceptionistSectionPanel();
         createVehicleEntryPanel();
-        createExitVehiclePanel();
+        createVehicleExitPanel();
         createDisponibleSpacesPanel();
         receptionistMenuPanel.add(receptionistSectionPanel, config);
         getContentPane().add(receptionistMenuPanel, "Receptionist Panel");
@@ -228,7 +228,7 @@ public class View extends JFrame{
         generateTicketButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Presenter.getInstance().generateTicket(vehicleEntry.getText());
+                Presenter.getInstance().generateEntryTicket(vehicleEntry.getText());
                 vehicleEntry.setText("");
             }
         });
@@ -303,7 +303,7 @@ public class View extends JFrame{
         receptionistSectionPanel.add(generateEntryTicketPanel, "Generate Entry Ticket Panel");
     }
 
-    private void createExitVehiclePanel() {
+    private void createVehicleExitPanel() {
         JPanel exitVehiclePanel = new JPanel();
         exitVehiclePanel.setLayout(new GridBagLayout());
         GridBagConstraints config = new GridBagConstraints();
@@ -317,14 +317,23 @@ public class View extends JFrame{
     
         config.gridy = 1;
         JTextField plateField = new JTextField(20);
+        plateField.setText("[A-Z]{3}(\\d{3}|\\d{2}[A-Z])");
         exitVehiclePanel.add(plateField, config);
     
         config.gridy = 2;
         JButton consultButton = new JButton("Consultar");
+        ButtonSummitControl consultSummitControl = new ButtonSummitControl(consultButton, exitVehiclePanel);
         consultButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Presenter.getInstance().consultTicket(plateField.getText());
+                double cost = Presenter.getInstance().vehicleExitCost(plateField.getText());
+                if(cost==-1){
+                    showErrorMessage("Error", "No existe un vehículo dentro del parqueadero con ese número de placa actualmente.");
+                }else{
+                    createConsultResultTicketPanel(plateField.getText(), cost);
+                    ((CardLayout)(receptionistSectionPanel.getLayout())).show(receptionistSectionPanel, "Consult Result Ticket Panel");
+                    plateField.setText("");
+                }
             }
         });
         exitVehiclePanel.add(consultButton, config);
@@ -332,7 +341,7 @@ public class View extends JFrame{
         receptionistSectionPanel.add(exitVehiclePanel, "Vehicle Exit Panel");
     }
 
-    private void createConsultResultTicketPanel(String plate, double amount) {
+    private void createConsultResultTicketPanel(String plate, double cost) {
         JPanel consultResultTicketPanel = new JPanel();
         consultResultTicketPanel.setLayout(new GridBagLayout());
         GridBagConstraints config = new GridBagConstraints();
@@ -342,11 +351,12 @@ public class View extends JFrame{
         config.gridx = 0;
         config.gridy = 0;
         config.gridwidth = 2;
-        consultResultTicketPanel.add(new JLabel("El valor a pagar por el vehículo " + plate + " es: $" + amount), config);
+        consultResultTicketPanel.add(new JLabel("El valor a pagar por el vehículo " + plate + " es: $" + cost), config);
     
         config.gridy = 1;
         config.gridwidth = 1;
         JTextField receivedAmountField = new JTextField(10);
+        receivedAmountField.setText("[0-9]+");
         consultResultTicketPanel.add(new JLabel("Valor recibido"), config);
         
         config.gridx = 1;
@@ -360,16 +370,34 @@ public class View extends JFrame{
         config.gridy = 3;
         config.gridwidth = 1;
         JButton correctPlateButton = new JButton("Corregir Placa");
+        correctPlateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ((CardLayout)(receptionistSectionPanel).getLayout()).show(receptionistSectionPanel, "Vehicle Exit Panel");
+            }
+        });
         consultResultTicketPanel.add(correctPlateButton, config);
 
         config.gridx = 1;
         JButton calculateAmountButton = new JButton("Calcular monto");
+        ButtonSummitControl calculateAmountSummitControl = new ButtonSummitControl(calculateAmountButton, consultResultTicketPanel);
+        calculateAmountButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(Presenter.getInstance().consolidateVehicleExit(plate, Double.parseDouble(receivedAmountField.getText()))){
+                    createGenerateExitTicketPanel(plate, cost, Double.parseDouble(receivedAmountField.getText()));
+                    ((CardLayout)(receptionistSectionPanel).getLayout()).show(receptionistSectionPanel, "Generate Exit Ticket Panel");
+                }else{
+                    showErrorMessage("Error", "Comprobar que el monto ingresado no es suficiente.");
+                }
+            }
+        });
+        
         consultResultTicketPanel.add(calculateAmountButton, config);
-    
-        receptionistSectionPanel.add(consultResultTicketPanel, "Generate Exit Ticket Panel");
+        receptionistSectionPanel.add(consultResultTicketPanel, "Consult Result Ticket Panel");
     }
 
-    private void createGenerateExitTicketPanel(String plate, double amount) {
+    private void createGenerateExitTicketPanel(String plate, double cost, double receivedAmount) {
         JPanel generateExitTicketPanel = new JPanel();
         generateExitTicketPanel.setLayout(new GridBagLayout());
         GridBagConstraints config = new GridBagConstraints();
@@ -379,74 +407,105 @@ public class View extends JFrame{
         config.gridx = 0;
         config.gridy = 0;
         config.gridwidth = 2;
-        generateExitTicketPanel.add(new JLabel("El valor a pagar por el vehículo " + plate + " es: $" + amount), config);
+        generateExitTicketPanel.add(new JLabel("El valor a pagar por el vehículo " + plate + " es: $" + cost), config);
     
         config.gridy = 1;
         config.gridwidth = 1;
-        generateExitTicketPanel.add(new JLabel("Valor recibido: "), config);
+        generateExitTicketPanel.add(new JLabel("Valor recibido: $"+receivedAmount), config);
     
-        config.gridx = 1;
-        JTextField receivedAmountField = new JTextField(10);
-        generateExitTicketPanel.add(receivedAmountField, config);
-
         config.gridx = 0;
         config.gridy = 2;
         config.gridwidth = 2;
-        generateExitTicketPanel.add(new JLabel("Cambio: $0.00"), config); 
+        generateExitTicketPanel.add(new JLabel("Cambio: $"+Presenter.getInstance().getTicketChange(plate)), config); 
 
         config.gridy = 3;
         config.gridwidth = 1;
         JButton anotherVehicleButton = new JButton("Salida de otro Vehículo");
+        anotherVehicleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ((CardLayout)(receptionistSectionPanel).getLayout()).show(receptionistSectionPanel, "Vehicle Exit Panel");
+            }
+        });
         generateExitTicketPanel.add(anotherVehicleButton, config);
     
         config.gridx = 1;
         JButton generateReceiptButton = new JButton("Generar Recibo");
+        generateReceiptButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                createExitTicketPanel(Presenter.getInstance().generateExitTicket(plate));
+                ((CardLayout)(receptionistSectionPanel).getLayout()).show(receptionistSectionPanel, "Exit Ticket Receipt Panel");
+            }
+        });
         generateExitTicketPanel.add(generateReceiptButton, config);
     
         receptionistSectionPanel.add(generateExitTicketPanel, "Generate Exit Ticket Panel");
     }
 
-    private void createExitTicketPanel(String plate, String date, String entryTime, String exitTime, double amount, double receivedAmount, double change) {
+    private void createExitTicketPanel(ArrayList<String> ticketInformation) {
         JPanel exitTicketReceiptPanel = new JPanel();
         exitTicketReceiptPanel.setLayout(new GridBagLayout());
         exitTicketReceiptPanel.setBorder(new MatteBorder(2, 2, 2, 2, Color.BLACK));
         GridBagConstraints config = new GridBagConstraints();
         config.insets = new Insets(10, 10, 10, 10);
-        config.anchor = GridBagConstraints.CENTER;
+        config.fill = GridBagConstraints.VERTICAL;
     
+        JPanel receiptPanel = new JPanel();
+        receiptPanel.setLayout(new GridBagLayout());
+        receiptPanel.setBorder(new MatteBorder(2, 2, 2, 2, Color.BLACK));
+        config.insets = new Insets(5, 5, 5, 5);
+        
         config.gridx = 0;
         config.gridy = 0;
-        config.gridwidth = 2;
-        exitTicketReceiptPanel.add(new JLabel("Nombre Parqueadero"), config);
-
+        receiptPanel.add(new JLabel(ticketInformation.get(0)), config);
+        
         config.gridy = 1;
-        exitTicketReceiptPanel.add(new JLabel("Vehículo: " + plate + "      Fecha: " + date), config);
+        receiptPanel.add(new JLabel("Vehículo: " + ticketInformation.get(1) + "      Fecha: " + ticketInformation.get(2)), config);
 
         config.gridy = 2;
-        exitTicketReceiptPanel.add(new JLabel("Hora de entrada: " + entryTime + "      Hora de salida: " + exitTime), config);
+        receiptPanel.add(new JLabel("Hora de entrada: " + ticketInformation.get(3) + "      Hora de salida: " + ticketInformation.get(4)), config);
 
         config.gridy = 3;
-        exitTicketReceiptPanel.add(new JLabel("Costo: $" + amount + "      Cambio: $" + change), config);
+        receiptPanel.add(new JLabel("Costo: $" + ticketInformation.get(5) + "      Cambio: $" + ticketInformation.get(6)), config);
 
         config.gridy = 4;
-        exitTicketReceiptPanel.add(new JLabel("Valor recibido: $" + receivedAmount), config);
+        receiptPanel.add(new JLabel("Valor recibido: $" + ticketInformation.get(7)), config);
 
         config.gridy = 5;
-        exitTicketReceiptPanel.add(new JLabel("¡Tenga un buen viaje!"), config);
-
+        receiptPanel.add(new JLabel("¡Tenga un buen viaje!"), config);
+        
+        config.gridy = 0;
+        exitTicketReceiptPanel.add(receiptPanel, config);
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new GridBagLayout());
         config.gridy = 0;
         config.gridwidth = 1;
-    
+        
+        config.gridx =  0;
         JButton printReceiptButton = new JButton("Imprimir Recibo");
         buttonsPanel.add(printReceiptButton, config);
-    
-        config.gridx = 1;
+        printReceiptButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showSimpleMessage("Impresora", "Se ha impreso el recibo.");
+            }
+        });
+        
+        config.gridx =  1;
         JButton anotherVehicleButton = new JButton("Salida de otro Vehículo");
         buttonsPanel.add(anotherVehicleButton, config);
-        receptionistSectionPanel.add(buttonsPanel, "Exit Ticket Buttons Panel");
+        anotherVehicleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ((CardLayout)(receptionistSectionPanel.getLayout())).show(receptionistSectionPanel, "Vehicle Exit Panel");
+            }
+        });
 
+        config.gridx =  0;
+        config.gridy = 1;
+        exitTicketReceiptPanel.add(buttonsPanel, config);
+        
         receptionistSectionPanel.add(exitTicketReceiptPanel, "Exit Ticket Receipt Panel");
     }
 
@@ -464,7 +523,41 @@ public class View extends JFrame{
         receptionistSectionPanel.add(disponibleSpacesPanel, "Disponible Spaces Panel");
     }
 
-    //UwU
+    private void createCurrentReceptionistReportPanel(ArrayList<String> reportInformation){
+        JPanel currentReceptionistReportPanel = new JPanel();
+        currentReceptionistReportPanel.setLayout(new GridBagLayout());
+        GridBagConstraints config = new GridBagConstraints();
+        config.insets = new Insets(5, 5, 5, 5);
+        
+        config.gridx = 0;
+        config.gridy = 0;
+        config.anchor = GridBagConstraints.CENTER;
+        DefaultTableModel tableModel = new DefaultTableModel(new String[]{"Fecha", reportInformation.get(0)}, 0);
+        JTable table = new JTable(tableModel);
+        table.setEnabled(false);
+        table.getTableHeader().setReorderingAllowed(false);
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setPreferredSize(new Dimension(400, 100));
+        String[] rowName = new String[]{"Hora de inicio","Hora de salida","Tiempo de actividad","Num. Vehículos ingresados","Dinero recaudado"};
+        currentReceptionistReportPanel.add(scrollPane,config);
+
+        for (int i = 0; i < rowName.length && (i+1)<reportInformation.size(); i++) {
+            tableModel.addRow(new String[]{rowName[i],reportInformation.get(i+1)});        
+        }  
+
+        config.gridy = 1;
+        JButton logoutButton = new JButton("Cerrar sesión");
+        logoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ((CardLayout)(getContentPane()).getLayout()).show(getContentPane(), "Login Panel");  
+            }
+            
+        });
+        currentReceptionistReportPanel.add(logoutButton,config);
+        receptionistSectionPanel.add(currentReceptionistReportPanel, "Current Receptionist Report Panel");
+    }
+
     private void createAdminMenuPanel(){
         adminMenuPanel = new JPanel();
         adminMenuPanel.setLayout(new GridBagLayout());
@@ -504,6 +597,7 @@ public class View extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(JOptionPane.showConfirmDialog(getContentPane(), "¿Estás seguro de que deseas cerrar sesión?")==JOptionPane.YES_OPTION){
+                    Presenter.getInstance().logout();
                     ((CardLayout)(getContentPane()).getLayout()).show(getContentPane(), "Login Panel");  
                 }
             }
@@ -642,6 +736,7 @@ public class View extends JFrame{
         String[] columnNames = {"Día", "Fecha de apertura", "Fecha de cierre"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable table = new JTable(tableModel);
+        table.getTableHeader().setReorderingAllowed(false);
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setPreferredSize(new Dimension(400, 100));
         registerParkingPanel.add(scrollPane, config);
@@ -1010,6 +1105,7 @@ public class View extends JFrame{
         config.gridy = 1;
         DefaultTableModel tableModelPR = new DefaultTableModel(new String[]{"Total de ingresos", "Número de vehículos"}, 0);
         JTable parkingReportTable = new JTable(tableModelPR);
+        parkingReportTable.getTableHeader().setReorderingAllowed(false);
         parkingReportTable.setEnabled(false);
         tableModelPR.addRow(Presenter.getInstance().generateParkingReport(date));
         JScrollPane scrollPanePR = new JScrollPane(parkingReportTable);
@@ -1019,6 +1115,7 @@ public class View extends JFrame{
         config.gridy = 2;
         DefaultTableModel tableModelRR = new DefaultTableModel(new String[]{"Recepcionista", "Ingresos", "Ingreso de vehículos"}, 0);
         JTable parkingReceptionistTable = new JTable(tableModelRR);
+        parkingReceptionistTable.getTableHeader().setReorderingAllowed(false);
         parkingReceptionistTable.setEnabled(false);
         String[][] receptionistReport = Presenter.getInstance().generateReceptionistReport(date);
         for(int i = 0; i < receptionistReport.length; i++){
@@ -1061,8 +1158,8 @@ public class View extends JFrame{
     }
 
     public void showGenerateExitTicketPanel(String date, double cost){
-        createGenerateExitTicketPanel(date, cost);
-        ((CardLayout)(receptionistSectionPanel.getLayout())).show(receptionistSectionPanel, "Generate Exit Ticket Panel");
+        //createGenerateExitTicketPanel(date, cost);
+        //((CardLayout)(receptionistSectionPanel.getLayout())).show(receptionistSectionPanel, "Generate Exit Ticket Panel");
     }
 
     public void showErrorMessage(String title, String message){

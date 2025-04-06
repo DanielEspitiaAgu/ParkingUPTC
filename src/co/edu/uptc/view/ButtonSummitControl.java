@@ -3,6 +3,8 @@
 package co.edu.uptc.view;
 
 import java.awt.Component;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -114,10 +116,7 @@ public class ButtonSummitControl  {
             button.setEnabled(true);
         }
         else{
-            button.setEnabled(false);
-            
+            button.setEnabled(false); 
         }
     }
-
-    
 }

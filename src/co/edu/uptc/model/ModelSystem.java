@@ -1,7 +1,10 @@
 package co.edu.uptc.model;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public class ModelSystem {
     private ArrayList<Receptionist> receptionists;
@@ -9,6 +12,7 @@ public class ModelSystem {
     private Parking parking;
     private Admin admin;
     private User currentUser;
+    private LocalDateTime activityStartTime;
 
     public ModelSystem() {
         this.receptionists = new ArrayList<Receptionist>();
@@ -95,6 +99,7 @@ public class ModelSystem {
         for(Receptionist receptionist:receptionists){
             if(receptionist.getIdNumber().equals(idNumber.toLowerCase()) && receptionist.getPassword().equals(password)){
                 currentUser = receptionist;
+                activityStartTime = LocalDateTime.now();
                 return 1;
             }
         }
@@ -239,4 +244,75 @@ public class ModelSystem {
         }
         return "";
     }
+
+    public boolean completeTicket(String plateNumber, double recivedAmount){
+        try{
+            Ticket ticket = consultIncompleteTicket(plateNumber);
+            double cost = ticket.getCost();
+            if (cost>recivedAmount)
+                return false;
+            ticket.setExitAttributes(recivedAmount-cost);
+            parking.setOcupedParks(parking.getOcupedParks()-1);
+            return true;
+        }catch (NullPointerException e){}
+        return false;
+    } 
+
+    public Ticket consultUltimateVehicleTicket(String plate){
+        ArrayList<Ticket> vehicleCompletedTickets = new ArrayList<Ticket>();
+        for(Ticket ticket:tickets){
+            if (ticket!=null) {
+                if(ticket.getVehicleNumberPlate().equals(plate)&&ticket.isComplete()){
+                    vehicleCompletedTickets.add(ticket);
+                }    
+            }
+        }
+        vehicleCompletedTickets.sort(Comparator.comparing(Ticket::getExitDate));
+        return vehicleCompletedTickets.get(vehicleCompletedTickets.size()-1);
+    }
+
+    public double getTicketChange(String plate){
+        Ticket recentTicket = consultUltimateVehicleTicket(plate);
+        return recentTicket.getChange();
+    }
+
+    public ArrayList<String> generateExitTicket(String plate){
+        Ticket recentTicket = consultUltimateVehicleTicket(plate);
+        return recentTicket.generateExitTicket(parking.getName());
+    }
+
+    public ArrayList<String> generateCurrentReceptionistReport(){
+        ArrayList<String> receptionistReport = new ArrayList<String>();
+        Receptionist receptionist;
+        receptionistReport.add(activityStartTime.getDayOfMonth()+"/"+activityStartTime.getMonthValue()+"/"+activityStartTime.getYear());
+        receptionistReport.add(activityStartTime.getHour()+":"+activityStartTime.getMinute());
+        receptionistReport.add(LocalTime.now().getHour()+":"+LocalTime.now().getMinute());
+        Duration duration = Duration.between(activityStartTime, LocalDateTime.now());
+        long hours = duration.toHours();
+        long minutes = duration.toMinutes();
+        receptionistReport.add(hours+" horas, "+minutes+ " minutos");
+        if (currentUser!=null) {
+            if (currentUser instanceof Receptionist) {
+                receptionist = (Receptionist) currentUser;
+                int vehicles = 0;
+                double money = 0;
+                for(Ticket ticket:tickets){
+                    if (ticket!=null) {
+                        if(ticket.getReceptionist()==receptionist){
+                            vehicles++; 
+                            if (ticket.isComplete()) {
+                                money+=ticket.getCost();    
+                            }
+                        }    
+                    }
+                }
+                receptionistReport.add(vehicles+"");
+                receptionistReport.add(money+"");
+                return receptionistReport;  
+            }
+        }
+        return null;
+    }
+
+    
 }
