@@ -37,7 +37,7 @@ public class Ticket {
 
     public double getCost() {
         if (!isComplete) {
-            cost = 2000 + Parking.minuteFee*(entryDate.getMinute() - LocalDateTime.now().getMinute());
+            cost = 2000 + Parking.minuteFee*Math.abs(entryDate.getMinute() - LocalDateTime.now().getMinute());
         }
         return cost;
     }

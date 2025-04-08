@@ -87,11 +87,11 @@ public final class Presenter {
 
     public void modifyReceptionist(String id, String newId, String password){
         if(modelSystem.editReceptionist(id, newId, password)){
-            view.showErrorMessage("Error", "No se pudo modificar el recepcionista.");
-        }else{
             view.showSimpleMessage("Modificación Exitosa", "El correo para facilitar el uso de las nuevas credenciales para el recepcionista se ha enviado.\n"+modelSystem.getReceptionistInfo(newId));
+        }else{
+            view.showErrorMessage("Error", "No se pudo modificar el recepcionista.");
         }
-    }
+    }   
 
     public void generateReport(LocalDate date){
         view.createReportPanel(date);

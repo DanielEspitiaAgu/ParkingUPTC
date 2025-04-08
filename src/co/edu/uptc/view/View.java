@@ -43,6 +43,12 @@ public class View extends JFrame{
     private JOptionPane jOptionPane;
     private JLabel disponibleSpacesLabel;
     private JLabel disponibleSpacesLabel2;
+    private Color charcoalBlack;
+    private Color softSkyBlue;
+    private Color goldenYellow;
+    private Color lightCream;
+    private Color warmGray;
+
 
     public View(){
         super("Parking UPTC");
@@ -52,6 +58,12 @@ public class View extends JFrame{
         jOptionPane = new JOptionPane();
         disponibleSpacesLabel = new JLabel();
         disponibleSpacesLabel2 = new JLabel();
+        charcoalBlack = new Color(16, 16, 16);
+        softSkyBlue = new Color(232, 240, 254);
+        goldenYellow = new Color(255, 208, 55);
+        lightCream = new Color(242, 237, 223);
+        warmGray = new Color(174, 173, 170);
+
         createLoginPanel();
         createAdminMenuPanel();
         createReceptionistMenuPanel();
@@ -713,7 +725,7 @@ public class View extends JFrame{
         config.gridx = 0;
         registerParkingPanel.add(new JLabel("Hora de apertura"), config);
         JTextField openingHour = new JTextField(10);
-        openingHour.setText("([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]");
+        openingHour.setText("(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]");
         config.gridx = 1;
         registerParkingPanel.add(openingHour, config);
         restrictComponents.add(openingHour);
@@ -722,7 +734,7 @@ public class View extends JFrame{
         config.gridx = 0;
         registerParkingPanel.add(new JLabel("Hora de cierre"), config);
         JTextField closingHour = new JTextField(10);
-        closingHour.setText("([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]");
+        closingHour.setText("(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]");
         config.gridx = 1;
         registerParkingPanel.add(closingHour, config);
         restrictComponents.add(closingHour);
@@ -732,7 +744,7 @@ public class View extends JFrame{
         config.gridx = 0;
         config.gridwidth = 2;
         config.anchor = GridBagConstraints.CENTER;
-
+        
         String[] columnNames = {"Día", "Fecha de apertura", "Fecha de cierre"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable table = new JTable(tableModel);
@@ -740,9 +752,14 @@ public class View extends JFrame{
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setPreferredSize(new Dimension(400, 100));
         registerParkingPanel.add(scrollPane, config);
+        
+        JPanel buttonsJPanel = new JPanel(new GridBagLayout());
 
-        config.gridy = 6;
-        config.fill = GridBagConstraints.CENTER;
+        config.gridwidth = 1;
+        config.gridx=0;
+        config.gridy = 1;
+        config.fill = GridBagConstraints.VERTICAL;
+        config.anchor = GridBagConstraints.CENTER;
         JButton saveConfigButton = new JButton("Guardar configuración");
         ButtonSummitControl saveConfigSummitControl = new ButtonSummitControl(saveConfigButton, restrictComponents);
         saveConfigButton.addActionListener(new ActionListener(){
@@ -751,16 +768,42 @@ public class View extends JFrame{
                 boolean isValid = true;
                 for(int i = 0; i < tableModel.getRowCount(); i++){
                     if (tableModel.getValueAt(i, 0).equals((String)dayComboBox.getSelectedItem())) 
-                        isValid = false;
+                    isValid = false;
                 }
                 if(isValid){
                     tableModel.addRow(new String[]{(String)dayComboBox.getSelectedItem(), openingHour.getText(), closingHour.getText()});  
                 }
             }
         });
-        registerParkingPanel.add(saveConfigButton, config);
+        buttonsJPanel.add(saveConfigButton, config);
         
+        config.gridx=1;
+        JButton clearTableButton = new JButton("Limpiar tabla");
+        clearTableButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tableModel.setRowCount(0);
+            }
+        });
+        buttonsJPanel.add(clearTableButton, config);
+        
+        config.gridx = 0;
+        config.gridy = 0;
+        config.gridwidth = 2;
+        JLabel label = new JLabel("<html><font color='red'>Las horas se deben ingresar como 09:00 o 10:00</font></html>");	 
+        buttonsJPanel.add(label, config);
+        
+        config.gridy = 6;
+        config.gridx = 0;
+        config.gridwidth = 2; 
+        config.insets = new Insets(0, 0, 0, 0);
+        registerParkingPanel.add(buttonsJPanel,config);
+        
+        config.insets = new Insets(5, 5, 5, 5);
+        config.gridx=0;
+        config.gridwidth=2;
         config.fill = GridBagConstraints.CENTER;
+        config.anchor = GridBagConstraints.CENTER;
         config.gridy = 8;
         JButton inputButton = new JButton("Ingresar");
         ButtonSummitControl inputSummitControl = new ButtonSummitControl(inputButton, registerParkingPanel);
@@ -781,7 +824,7 @@ public class View extends JFrame{
                         openingHour.setText("");
                         closingHour.setText("");
                     }else{
-                        showErrorMessage("Error", "No se pudo registrar el parqueadero.");
+                        showErrorMessage("Error", "No se pudo registrar el parqueadero. Verifique si ya existe un parqueadero.");
                     }
                 }else{
                     showErrorMessage("Error", "Debe ingresar al menos 1 días de apertura y cierre.");
@@ -918,7 +961,7 @@ public class View extends JFrame{
         editReceptionistPanel.add(new JSeparator(), config);
         
         config.gridy = 4;
-        JLabel modifyLabel = new JLabel("<html>Digite los datos a modificar del recepcionista (<font color='red'>debe seleccionar un recepcionista</font></html>): ");
+        JLabel modifyLabel = new JLabel("<html>Digite los datos a modificar del recepcionista (<font color='red'>debe seleccionar un recepcionista</font>)</html>: ");
         editReceptionistPanel.add(modifyLabel, config);
         
         config.gridy = 1;
@@ -926,9 +969,11 @@ public class View extends JFrame{
         receptionistDropdown.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                if(receptionistDropdown.getSelectedValue()!=null)
+                if(receptionistDropdown.getSelectedValue()!=null){
                     modifyLabel.setText("Digite los datos a modificar del recepcionista ("+receptionistDropdown.getSelectedValue()+"): ");
-                modifyLabel.setText("<html>aDigite los datos a modificar del recepcionista (<font color='red'>debe seleccionar un recepcionista</font>): </html>");
+                }else{
+                    modifyLabel.setText("<html>aDigite los datos a modificar del recepcionista (<font color='red'>debe seleccionar un recepcionista</font>): </html>");
+                }
             }
             
         });
@@ -992,6 +1037,7 @@ public class View extends JFrame{
 
         config.gridy = 9;
         config.anchor = GridBagConstraints.CENTER;
+        config.fill = GridBagConstraints.CENTER ;
         JButton acceptButton = new JButton("Aceptar");
         ButtonSummitControl acceptSummitControl = new ButtonSummitControl(acceptButton, editReceptionistPanel);
         acceptButton.addActionListener(new ActionListener() {

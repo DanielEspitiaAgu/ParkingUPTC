@@ -16,15 +16,13 @@ public class ModelSystem {
 
     public ModelSystem() {
         this.receptionists = new ArrayList<Receptionist>();
-        this.parking = new Parking("Parking 1", "Calle 10 #45-67", 10, new ArrayList<String>());
         this.admin = new Admin("0001", "admin@uptc.edu.co", "123abc", "Pedrito", "Me electrocutaste");
         this.tickets = new ArrayList<Ticket>();
 
         receptionists.add(new Receptionist("001", "ana.gomez@example.com", "pass123", "Ana", "Gómez", "555-1234", "Calle 10 #45-67"));
         receptionists.add(new Receptionist("002", "mario.luna@example.com", "secure456", "Mario", "Luna", "555-5678", "Carrera 12 #34-89"));
         receptionists.add(new Receptionist("003", "lucia.mendez@example.com", "clave789", "Lucía", "Méndez", "555-8765", "Avenida Siempre Viva 123"));
-        receptionists.add(new Receptionist("004", "carlos.rios@example.com", "admin321", "Carlos", "Ríos", "555-4321", "Diagonal 25 #98-54"));
-        receptionists.add(new Receptionist("005", "sofia.vega@example.com", "pass987", "Sofía", "Vega", "555-6789", "Transversal 45 #76-32"));
+    
     }
 
     public ArrayList<String> getReceptionistList(){
@@ -119,11 +117,11 @@ public class ModelSystem {
         int numCars = 0;
         double totalIncome = 0;
         for(Ticket ticket:tickets){
-            if(ticket.isComplete())
-                if(ticket.getExitDate().getYear()==date.getYear() && ticket.getExitDate().getDayOfYear()==date.getDayOfYear()){
-                    numCars++;
+            if(ticket.getEntryDate().getYear()==date.getYear() && ticket.getEntryDate().getDayOfYear()==date.getDayOfYear()){
+                numCars++;
+                if(ticket.isComplete())
                     totalIncome+=ticket.getCost();
-                }
+            }
         }
         reports.add(totalIncome+"");
         reports.add(numCars+"");
@@ -139,11 +137,10 @@ public class ModelSystem {
             receptionistReport.add(receptionist.getName()+" "+receptionist.getLastName());
             for(Ticket ticket:tickets){
                 if(ticket.getReceptionist()==receptionist){
-                    if(ticket.isComplete()){
-                        if(ticket.getExitDate().getYear()==date.getYear() && ticket.getExitDate().getDayOfYear()==date.getDayOfYear()){
-                            numCars++;
+                    if(ticket.getEntryDate().getYear()==date.getYear() && ticket.getEntryDate().getDayOfYear()==date.getDayOfYear()){
+                        numCars++;
+                        if(ticket.isComplete())
                             totalIncome+=ticket.getCost();
-                        }
                     }
                 }
             }
