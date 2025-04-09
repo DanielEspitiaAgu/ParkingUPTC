@@ -44,11 +44,8 @@ public class View extends JFrame{
     private JLabel disponibleSpacesLabel;
     private JLabel disponibleSpacesLabel2;
     private Color charcoalBlack;
-    private Color softSkyBlue;
     private Color goldenYellow;
     private Color lightCream;
-    private Color warmGray;
-
 
     public View(){
         super("Parking UPTC");
@@ -59,38 +56,32 @@ public class View extends JFrame{
         disponibleSpacesLabel = new JLabel();
         disponibleSpacesLabel2 = new JLabel();
         charcoalBlack = new Color(16, 16, 16);
-        softSkyBlue = new Color(232, 240, 254);
         goldenYellow = new Color(255, 208, 55);
-        lightCream = new Color(242, 237, 223);
-        warmGray = new Color(174, 173, 170);
-
+        lightCream = new Color(250, 245, 223);
         createLoginPanel();
         createAdminMenuPanel();
         createReceptionistMenuPanel();
-        //JTextField textField = new JTextField();
-        //textField.setText(regex);
-        //JButton button = new JButton("ingresar[action]");
-        //ClaseEsa.add(LoginPanel);
-
         setVisible(true);
     }
 
     private void createReceptionistSectionPanel(){
         receptionistSectionPanel = new JPanel();
         receptionistSectionPanel.setLayout(new CardLayout());
-        receptionistSectionPanel.setBorder(new MatteBorder(2, 2, 2, 2, Color.BLACK));
+        receptionistSectionPanel.setBorder(new MatteBorder(2, 2, 2, 2, charcoalBlack));
     }
 
     private void createAdminSectionPanel(){
         adminSectionPanel = new JPanel();
         adminSectionPanel.setLayout(new CardLayout());
-        adminSectionPanel.setBorder(new MatteBorder(2, 2, 2, 2, Color.BLACK));
+        adminSectionPanel.setBackground(lightCream);
+        adminSectionPanel.setBorder(new MatteBorder(2, 2, 2, 2, charcoalBlack));
         reportPanel = new JPanel();
         adminSectionPanel.add(reportPanel, "Report Panel");
     }
 
     private void createLoginPanel(){
         loginPanel = new JPanel();
+        loginPanel.setBackground(lightCream);
         loginPanel.setLayout(new GridBagLayout());
         GridBagConstraints config = new GridBagConstraints();
 
@@ -147,10 +138,12 @@ public class View extends JFrame{
     private void createReceptionistMenuPanel(){
         loginPanel.setVisible(false);
         receptionistMenuPanel = new JPanel();
+        receptionistMenuPanel.setBackground(lightCream);
         receptionistMenuPanel.setLayout(new GridBagLayout());
         GridBagConstraints config = new GridBagConstraints();
 
         JButton vehicleEntryButton = new JButton("Ingreso de vehiculo");
+        vehicleEntryButton.setBackground(goldenYellow);
         vehicleEntryButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -160,6 +153,7 @@ public class View extends JFrame{
             
         });
         JButton vehicleExitButton = new JButton("Salida de vehículo");
+        vehicleExitButton.setBackground(goldenYellow);
         vehicleExitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -167,6 +161,7 @@ public class View extends JFrame{
             }
         });
         JButton disponibleSpaces = new JButton("Espacios disponibles");
+        disponibleSpaces.setBackground(goldenYellow);
         disponibleSpaces.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {   
@@ -175,6 +170,7 @@ public class View extends JFrame{
             }
         });
         JButton logOutButton = new JButton("Cerrar sesión");
+        logOutButton.setBackground(goldenYellow);
         logOutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -293,6 +289,7 @@ public class View extends JFrame{
         config.anchor = GridBagConstraints.CENTER;
         config.gridwidth = 1;
         JButton printTicketButton = new JButton("Imprimir ticket");
+        printTicketButton.setBackground(goldenYellow);
         printTicketButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -304,6 +301,7 @@ public class View extends JFrame{
         config.gridx = 1;
         config.anchor = GridBagConstraints.CENTER;
         JButton anotherVehicleButton= new JButton("Ingresar otro vehículo");
+        anotherVehicleButton.setBackground(goldenYellow);
         anotherVehicleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -382,6 +380,7 @@ public class View extends JFrame{
         config.gridy = 3;
         config.gridwidth = 1;
         JButton correctPlateButton = new JButton("Corregir Placa");
+        correctPlateButton.setBackground(goldenYellow);
         correctPlateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -433,6 +432,7 @@ public class View extends JFrame{
         config.gridy = 3;
         config.gridwidth = 1;
         JButton anotherVehicleButton = new JButton("Salida de otro Vehículo");
+        anotherVehicleButton.setBackground(goldenYellow);
         anotherVehicleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -443,6 +443,7 @@ public class View extends JFrame{
     
         config.gridx = 1;
         JButton generateReceiptButton = new JButton("Generar Recibo");
+        generateReceiptButton.setBackground(goldenYellow);
         generateReceiptButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -496,6 +497,7 @@ public class View extends JFrame{
         
         config.gridx =  0;
         JButton printReceiptButton = new JButton("Imprimir Recibo");
+        printReceiptButton.setBackground(goldenYellow);
         buttonsPanel.add(printReceiptButton, config);
         printReceiptButton.addActionListener(new ActionListener() {
             @Override
@@ -506,6 +508,7 @@ public class View extends JFrame{
         
         config.gridx =  1;
         JButton anotherVehicleButton = new JButton("Salida de otro Vehículo");
+        anotherVehicleButton.setBackground(goldenYellow);
         buttonsPanel.add(anotherVehicleButton, config);
         anotherVehicleButton.addActionListener(new ActionListener() {
             @Override
@@ -559,6 +562,7 @@ public class View extends JFrame{
 
         config.gridy = 1;
         JButton logoutButton = new JButton("Cerrar sesión");
+        logoutButton.setBackground(goldenYellow);
         logoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -572,10 +576,12 @@ public class View extends JFrame{
 
     private void createAdminMenuPanel(){
         adminMenuPanel = new JPanel();
+        adminMenuPanel.setBackground(lightCream);
         adminMenuPanel.setLayout(new GridBagLayout());
         GridBagConstraints config = new GridBagConstraints();
 
         JButton registParkingButton = new JButton("Registrar parqueadero");
+        registParkingButton.setBackground(goldenYellow);
         registParkingButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -583,6 +589,7 @@ public class View extends JFrame{
             }
         });
         JButton createReceptionistButton = new JButton("Crear recepcionista");
+        createReceptionistButton.setBackground(goldenYellow);
         createReceptionistButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -590,6 +597,7 @@ public class View extends JFrame{
             }
         });
         JButton modifyReceptionistButton = new JButton("Modificar recepcionista");
+        modifyReceptionistButton.setBackground(goldenYellow);
         modifyReceptionistButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -598,6 +606,7 @@ public class View extends JFrame{
             }
         });
         JButton generateSalesReportButton = new JButton("Generar reporte de ventas");
+        generateSalesReportButton.setBackground(goldenYellow);
         generateSalesReportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -605,6 +614,7 @@ public class View extends JFrame{
             }
         });
         JButton logOutButton = new JButton("Cerrar sesión");
+        logOutButton.setBackground(goldenYellow);
         logOutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -779,6 +789,7 @@ public class View extends JFrame{
         
         config.gridx=1;
         JButton clearTableButton = new JButton("Limpiar tabla");
+        clearTableButton.setBackground(goldenYellow);
         clearTableButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -790,7 +801,7 @@ public class View extends JFrame{
         config.gridx = 0;
         config.gridy = 0;
         config.gridwidth = 2;
-        JLabel label = new JLabel("<html><font color='red'>Las horas se deben ingresar como 09:00 o 10:00</font></html>");	 
+        JLabel label = new JLabel("<html><font color='#00298B'>Las horas se deben ingresar como 09:00 o 10:00</font></html>");	 
         buttonsJPanel.add(label, config);
         
         config.gridy = 6;
@@ -961,7 +972,7 @@ public class View extends JFrame{
         editReceptionistPanel.add(new JSeparator(), config);
         
         config.gridy = 4;
-        JLabel modifyLabel = new JLabel("<html>Digite los datos a modificar del recepcionista (<font color='red'>debe seleccionar un recepcionista</font>)</html>: ");
+        JLabel modifyLabel = new JLabel("<html>Digite los datos a modificar del recepcionista (<font color='#00298B'>debe seleccionar un recepcionista</font>)</html>: ");
         editReceptionistPanel.add(modifyLabel, config);
         
         config.gridy = 1;
@@ -972,7 +983,7 @@ public class View extends JFrame{
                 if(receptionistDropdown.getSelectedValue()!=null){
                     modifyLabel.setText("Digite los datos a modificar del recepcionista ("+receptionistDropdown.getSelectedValue()+"): ");
                 }else{
-                    modifyLabel.setText("<html>aDigite los datos a modificar del recepcionista (<font color='red'>debe seleccionar un recepcionista</font>): </html>");
+                    modifyLabel.setText("<html>aDigite los datos a modificar del recepcionista (<font color='#00298B'>debe seleccionar un recepcionista</font>): </html>");
                 }
             }
             
@@ -1017,7 +1028,7 @@ public class View extends JFrame{
     
         config.gridx = 1;
         JPasswordField passwordField = new JPasswordField(20);
-        passwordField.setText(".{8,}");
+        passwordField.setText("[A-Za-z0-9]{8}");
         editReceptionistPanel.add(passwordField, config);
         
         config.gridy = 7;
@@ -1026,13 +1037,13 @@ public class View extends JFrame{
         
         config.gridx = 1;
         JPasswordField confirmPasswordField = new JPasswordField(20);
-        confirmPasswordField.setText(".{8,}");
+        confirmPasswordField.setText("[A-Za-z0-9]{8}");
         editReceptionistPanel.add(confirmPasswordField, config);
     
         config.gridy = 8;
         config.gridx = 0;
         config.gridwidth = 2;
-        JLabel passwordNote = new JLabel("<html><font color='red'>Tenga en cuenta que la nueva contraseña no debe ser repetida ni tener caracteres especiales y debe ser de 8 dígitos.</font></html>");
+        JLabel passwordNote = new JLabel("<html><font color='#00298B'>Tenga en cuenta que la nueva contraseña no debe ser repetida ni tener caracteres especiales y debe ser de 8 caracteres.</font></html>");
         editReceptionistPanel.add(passwordNote, config);
 
         config.gridy = 9;
@@ -1173,6 +1184,7 @@ public class View extends JFrame{
 
         config.gridy = 3;
         JButton acceptButton = new JButton("Aceptar");
+        acceptButton.setBackground(goldenYellow);
         acceptButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1201,11 +1213,6 @@ public class View extends JFrame{
     public void showGenerateEntryTicketPanel(ArrayList<String> entryTicketInfo){
         createGenerateEntryTicketPanel(entryTicketInfo);
         ((CardLayout)(receptionistSectionPanel.getLayout())).show(receptionistSectionPanel, "Generate Entry Ticket Panel");
-    }
-
-    public void showGenerateExitTicketPanel(String date, double cost){
-        //createGenerateExitTicketPanel(date, cost);
-        //((CardLayout)(receptionistSectionPanel.getLayout())).show(receptionistSectionPanel, "Generate Exit Ticket Panel");
     }
 
     public void showErrorMessage(String title, String message){

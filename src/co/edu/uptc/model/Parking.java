@@ -82,9 +82,12 @@ public class Parking {
 
     @Override
     public String toString() {
-        return "Parking [name=" + name + ", address=" + address + ", spaces=" + spaces + ", occupiedSpaces="
-                + occupiedSpaces + ", schedule=" + schedule.toString() + "]";
+        return "Parqueadero:\n" +
+               "  Nombre: " + name + ",\n" +
+               "  Dirección: " + address + ",\n" +
+               "  Espacios Totales: " + spaces + ",\n" +
+               "  Espacios Ocupados: " + occupiedSpaces + ",\n" +
+               "  Horario: " + schedule.toString() + "\n";
     }
 
-    
 }

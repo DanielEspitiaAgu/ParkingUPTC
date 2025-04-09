@@ -55,4 +55,13 @@ public class User {
         this.password = password;
     } 
 
+    @Override
+    public String toString() {
+        return "Usuario:\n" +
+                "  ID: " + idNumber + ",\n" +
+                "  Correo Electrónico: " + email + ",\n" +
+                "  Nombre: " + name + ",\n" +
+                "  Apellido: " + lastName + "\n";
+    }
+
 }

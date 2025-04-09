@@ -16,7 +16,7 @@ public class ModelSystem {
 
     public ModelSystem() {
         this.receptionists = new ArrayList<Receptionist>();
-        this.admin = new Admin("0001", "admin@uptc.edu.co", "123abc", "Pedrito", "Me electrocutaste");
+        this.admin = new Admin("0001", "admin@uptc.edu.co", "123abc", "Jefe", "Administrativo");
         this.tickets = new ArrayList<Ticket>();
 
         receptionists.add(new Receptionist("001", "ana.gomez@example.com", "pass123", "Ana", "Gómez", "555-1234", "Calle 10 #45-67"));
@@ -219,6 +219,12 @@ public class ModelSystem {
     }
     
     public boolean editReceptionist(String id, String newId, String password) {
+        for(Receptionist reseptionist:receptionists){
+            if(reseptionist.getIdNumber().equals(newId))
+                return false;
+        }
+        if(admin.getIdNumber().equals(newId))
+            return false;
         for(Receptionist reseptionist:receptionists){
             if(reseptionist.getIdNumber().equals(id)){
                 if(reseptionist.getPassword().equals(password)){

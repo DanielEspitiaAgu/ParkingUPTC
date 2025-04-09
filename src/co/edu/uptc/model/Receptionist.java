@@ -30,8 +30,13 @@ public class Receptionist extends User {
 
     @Override
     public String toString() {
-        return "Receptionist [" +"Name=" + getName() +", LastName=" + getLastName() +", ID=" + getIdNumber() +", Email=" + getEmail() +
-            ", Phone=" + phone +", Address=" + adress +"]";
+        return "Recepcionista:\n" +
+               "  Nombre: " + getName() + ",\n" +
+               "  Apellido: " + getLastName() + ",\n" +
+               "  ID: " + getIdNumber() + ",\n" +
+               "  Correo Electrónico: " + getEmail() + ",\n" +
+               "  Teléfono: " + phone + ",\n" +
+               "  Dirección: " + adress + "\n";
     }
    
 }

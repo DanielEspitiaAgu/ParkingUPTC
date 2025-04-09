@@ -101,10 +101,16 @@ public class ButtonSummitControl  {
                     if (!readyComponents.contains(field)) {
                         readyComponents.add(field);
                         field.setBorder(BorderFactory.createEtchedBorder(Color.GRAY,Color.WHITE));
+                        button.setBackground(new Color(255, 208, 55));
                     }
                 } else {
                     readyComponents.remove(field);
-                    field.setBorder(BorderFactory.createEtchedBorder(Color.RED,Color.RED));
+                    if (field.getText().isEmpty()||field.getText() == "") {
+                        field.setBorder(BorderFactory.createEtchedBorder(Color.GRAY,Color.WHITE));
+                    }else{
+                        field.setBorder(BorderFactory.createEtchedBorder(Color.RED,Color.RED));
+                    }
+                    button.setBackground(Color.LIGHT_GRAY);
                 }
                 checkRestrictions();
             }
@@ -114,9 +120,9 @@ public class ButtonSummitControl  {
     private void checkRestrictions() {
         if(readyComponents.size() == components.size()){
             button.setEnabled(true);
-        }
-        else{
+        }else{
             button.setEnabled(false); 
         }
     }
+
 }
