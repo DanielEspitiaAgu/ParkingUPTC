@@ -37,7 +37,7 @@ public class ServiceDaySchedule {
         this.finishTime = finishTime;
     }
 
-    public String dayToString() {
+    private String dayToString() {
         switch (day) {
             case 1:
                 return "LUNES";

@@ -708,7 +708,7 @@ public class View extends JFrame{
 
         JLabel spacesLabel = new JLabel("Número de espacios:");
         JTextField spacesField = new JTextField(20);
-        spacesField.setText("[0-9]+");
+        spacesField.setText("[1-9][0-9]*");
         config.gridx = 0;
         config.gridy = 2;
         config.anchor = GridBagConstraints.LINE_END;
