@@ -18,11 +18,6 @@ public class ModelSystem {
         this.receptionists = new ArrayList<Receptionist>();
         this.admin = new Admin("0001", "admin@uptc.edu.co", "123abc", "Jefe", "Administrativo");
         this.tickets = new ArrayList<Ticket>();
-
-        receptionists.add(new Receptionist("001", "ana.gomez@example.com", "pass123", "Ana", "Gómez", "555-1234", "Calle 10 #45-67"));
-        receptionists.add(new Receptionist("002", "mario.luna@example.com", "secure456", "Mario", "Luna", "555-5678", "Carrera 12 #34-89"));
-        receptionists.add(new Receptionist("003", "lucia.mendez@example.com", "clave789", "Lucía", "Méndez", "555-8765", "Avenida Siempre Viva 123"));
-    
     }
 
     public ArrayList<String> getReceptionistList(){
