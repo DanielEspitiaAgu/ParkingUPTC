@@ -937,7 +937,7 @@ public class View extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (Presenter.getInstance().registerReceptionist(documentField.getText(), emailField.getText(), firstNameField.getText(), lastNameField.getText(), phoneField.getText(), addressField.getText())){
-                    showSimpleMessage("Registro Exitoso", "El recepcionista ha sido registrado con éxito.\n"+Presenter.getInstance().getReceptionistInfo(documentField.getText()));
+                    showSimpleMessage("Registro Exitoso", "El recepcionista ha sido registrado con éxito.\n"+Presenter.getInstance().getReceptionistInfo(documentField.getText())+ "\nSu clave es su nombre + su documento de identidad");
                     documentField.setText("");
                     emailField.setText("");
                     firstNameField.setText("");
